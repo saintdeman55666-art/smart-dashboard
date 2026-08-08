@@ -3,63 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ULTRA Dashboard</title>
+    <title>🏆 ULTRA Premium Dashboard</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        :root{--bg:#0a0e17;--card:#111827;--border:#1f2937;--grn:#10b981;--red:#ef4444;--blu:#3b82f6;--gld:#f59e0b;--ppl:#8b5cf6;--txt:#e5e7eb;--tx2:#9ca3af}
         *{margin:0;padding:0;box-sizing:border-box}
-        body{background:#0a0e17;color:#e5e7eb;font-family:-apple-system,sans-serif;padding:16px;min-height:100vh}
-        .header{text-align:center;padding:16px 0}
-        .logo{width:48px;height:48px;margin:0 auto 8px;background:linear-gradient(135deg,#10b981,#3b82f6);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px}
-        h1{font-size:18px;font-weight:800}
-        .btn{display:block;width:100%;padding:14px;border:none;border-radius:14px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin:8px 0;text-align:center}
-        .btn.blue{background:linear-gradient(135deg,#3b82f6,#8b5cf6)}
-        .btn.green{background:#10b981}
-        .btn.gold{background:#f59e0b}
+        body{background:var(--bg);color:var(--txt);font-family:-apple-system,sans-serif;padding:16px;min-height:100vh}
+        .header{text-align:center;padding:20px 0}
+        .logo{width:60px;height:60px;margin:0 auto 12px;background:linear-gradient(135deg,#10b981,#3b82f6,#8b5cf6);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 8px 32px rgba(16,185,129,.3)}
+        h1{font-size:22px;font-weight:800;background:linear-gradient(135deg,#10b981,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% 200%;animation:gradient 3s ease infinite}
+        @keyframes gradient{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+        .subtitle{color:var(--tx2);font-size:12px;margin-top:4px}
+        .live-dot{display:inline-block;width:8px;height:8px;background:var(--grn);border-radius:50%;animation:pulse 2s infinite;margin-right:6px}
+        @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.4)}50%{box-shadow:0 0 0 12px rgba(16,185,129,0)}}
+        .section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin:12px 0}
+        .section h3{font-size:13px;margin-bottom:10px;color:var(--tx2);text-transform:uppercase;letter-spacing:1px}
+        .btn{display:block;width:100%;padding:16px;border:none;border-radius:14px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin:8px 0;text-align:center;transition:all .2s}
         .btn:active{transform:scale(.96)}
-        .toggle-row{display:flex;justify-content:space-between;align-items:center;padding:12px;background:#111827;border:1px solid #1f2937;border-radius:14px;margin:8px 0}
-        .toggle{width:48px;height:26px;background:#1f2937;border-radius:13px;cursor:pointer;transition:background .3s}
-        .toggle.on{background:#10b981}
-        .toggle div{width:22px;height:22px;background:#fff;border-radius:50%;margin:2px;transition:transform .3s}
-        .toggle.on div{transform:translateX(22px)}
-        .section{background:#111827;border:1px solid #1f2937;border-radius:14px;padding:14px;margin:10px 0}
-        .section h3{font-size:13px;margin-bottom:8px;color:#9ca3af}
-        .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-        .stat-card{background:#0a0e17;border-radius:10px;padding:10px;text-align:center}
-        .stat-card .value{font-size:20px;font-weight:800}
-        .stat-card .label{font-size:9px;color:#9ca3af;text-transform:uppercase}
-        .green{color:#10b981}.gold{color:#f59e0b}.blue{color:#3b82f6}.purple{color:#8b5cf6}
+        .btn-premium{background:linear-gradient(135deg,#10b981,#3b82f6,#8b5cf6);background-size:200% 200%;animation:gradient 3s ease infinite}
+        .btn-gold{background:linear-gradient(135deg,#f59e0b,#fbbf24)}
+        .btn-green{background:var(--grn)}
+        .toggle-row{display:flex;justify-content:space-between;align-items:center;padding:14px;background:var(--bg);border-radius:12px;margin:8px 0}
+        .toggle{width:52px;height:28px;background:var(--border);border-radius:14px;cursor:pointer;transition:background .3s}
+        .toggle.on{background:var(--grn)}
+        .toggle div{width:24px;height:24px;background:#fff;border-radius:50%;margin:2px;transition:transform .3s}
+        .toggle.on div{transform:translateX(24px)}
+        .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+        .stat-card{background:var(--bg);border-radius:12px;padding:12px;text-align:center;border:1px solid transparent;transition:border-color .3s}
+        .stat-card:hover{border-color:var(--blu)}
+        .stat-card .value{font-size:22px;font-weight:800}
+        .stat-card .label{font-size:9px;color:var(--tx2);text-transform:uppercase;letter-spacing:1px}
+        .grn{color:var(--grn)}.gld{color:var(--gld)}.blu{color:var(--blu)}.ppl{color:var(--ppl)}
+        .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--blu);color:#fff;padding:12px 24px;border-radius:24px;font-weight:600;font-size:13px;z-index:999;animation:fadeIn .3s ease}
+        @keyframes fadeIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="logo">⚡</div>
-        <h1>ULTRA Smart Money</h1>
-        <p style="color:#9ca3af;font-size:11px">v10.2 • <span style="color:#10b981">●</span> Live</p>
+        <div class="logo">🏆</div>
+        <h1>ULTRA Premium</h1>
+        <p class="subtitle"><span class="live-dot"></span>Live • Bot v11.0 • Премиум</p>
     </div>
 
-    <div class="section">
-        <h3>📊 Статистика (запрос из бота)</h3>
-        <div class="stats-grid">
-            <div class="stat-card"><div class="label">Сделок</div><div class="value gold" id="t">—</div></div>
-            <div class="stat-card"><div class="label">Винрейт</div><div class="value green" id="w">—</div></div>
-            <div class="stat-card"><div class="label">CALL</div><div class="value blue" id="c">—</div></div>
-            <div class="stat-card"><div class="label">PUT</div><div class="value purple" id="p">—</div></div>
-        </div>
-    </div>
-
-    <button class="btn blue" onclick="sendCmd('get_stats')">🔄 ЗАПРОСИТЬ СТАТИСТИКУ</button>
-    <button class="btn green" onclick="sendCmd('forex')">💱 ЗАПРОСИТЬ FOREX СИГНАЛ</button>
-    <button class="btn gold" onclick="sendCmd('otc')">💎 ЗАПРОСИТЬ OTC СИГНАЛ</button>
+    <button class="btn btn-premium" onclick="sendCmd('get_stats')">📊 ЗАПРОСИТЬ СТАТИСТИКУ</button>
+    <button class="btn btn-gold" onclick="sendCmd('forex')">💱 ЗАПРОСИТЬ FOREX СИГНАЛ</button>
+    <button class="btn btn-green" onclick="sendCmd('otc')">💎 ЗАПРОСИТЬ OTC СИГНАЛ</button>
 
     <div class="section">
-        <h3>🤖 Автотрейдинг</h3>
+        <h3>🤖 АВТО-ТРЕЙДИНГ</h3>
         <div class="toggle-row">
-            <span>💱 Forex</span>
+            <span>💱 Forex Auto</span>
             <div class="toggle" id="tf" onclick="toggleAuto('forex')"><div></div></div>
         </div>
         <div class="toggle-row">
-            <span>💎 OTC</span>
+            <span>💎 OTC Auto</span>
             <div class="toggle" id="to" onclick="toggleAuto('otc')"><div></div></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>📊 БЫСТРАЯ СТАТИСТИКА</h3>
+        <div class="stats-grid">
+            <div class="stat-card"><div class="label">Сделок</div><div class="value gld" id="t">—</div></div>
+            <div class="stat-card"><div class="label">Винрейт</div><div class="value grn" id="w">—</div></div>
+            <div class="stat-card"><div class="label">CALL</div><div class="value blu" id="c">—</div></div>
+            <div class="stat-card"><div class="label">PUT</div><div class="value ppl" id="p">—</div></div>
         </div>
     </div>
 
@@ -68,18 +76,31 @@
         if(tg) tg.expand();
         let af=false, ao=false;
         
+        function showToast(msg){
+            const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
+            document.body.appendChild(t); setTimeout(()=>t.remove(),1500);
+        }
+        
         function sendCmd(cmd){
             if(cmd==='get_stats'){
                 if(tg) tg.sendData(JSON.stringify({get_stats:true}));
-                alert('📊 Статистика отправлена в бот!');
+                showToast('📊 Статистика запрошена!');
             } else {
                 if(tg){ tg.sendData(JSON.stringify({request_signal:cmd})); tg.close(); }
+                showToast('🔥 Сигнал запрошен!');
             }
         }
         
         function toggleAuto(type){
-            if(type==='forex'){ af=!af; document.getElementById('tf').classList.toggle('on',af); if(tg) tg.sendData(JSON.stringify({auto_forex:af})); }
-            else{ ao=!ao; document.getElementById('to').classList.toggle('on',ao); if(tg) tg.sendData(JSON.stringify({auto_otc:ao})); }
+            if(type==='forex'){
+                af=!af; document.getElementById('tf').classList.toggle('on',af);
+                if(tg) tg.sendData(JSON.stringify({auto_forex:af}));
+                showToast('Forex: '+(af?'🟢 ВКЛ':'🔴 ВЫКЛ'));
+            } else {
+                ao=!ao; document.getElementById('to').classList.toggle('on',ao);
+                if(tg) tg.sendData(JSON.stringify({auto_otc:ao}));
+                showToast('OTC: '+(ao?'🟢 ВКЛ':'🔴 ВЫКЛ'));
+            }
         }
     </script>
 </body>
