@@ -2,106 +2,313 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>🏆 ULTRA Premium Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ULTRA Bot">
+    <meta name="theme-color" content="#0a0e17">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>ULTRA Smart Money</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root{--bg:#0a0e17;--card:#111827;--border:#1f2937;--grn:#10b981;--red:#ef4444;--blu:#3b82f6;--gld:#f59e0b;--ppl:#8b5cf6;--txt:#e5e7eb;--tx2:#9ca3af}
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{background:var(--bg);color:var(--txt);font-family:-apple-system,sans-serif;padding:16px;min-height:100vh}
-        .header{text-align:center;padding:20px 0}
-        .logo{width:60px;height:60px;margin:0 auto 12px;background:linear-gradient(135deg,#10b981,#3b82f6,#8b5cf6);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 8px 32px rgba(16,185,129,.3)}
-        h1{font-size:22px;font-weight:800;background:linear-gradient(135deg,#10b981,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% 200%;animation:gradient 3s ease infinite}
-        @keyframes gradient{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
-        .subtitle{color:var(--tx2);font-size:12px;margin-top:4px}
-        .live-dot{display:inline-block;width:8px;height:8px;background:var(--grn);border-radius:50%;animation:pulse 2s infinite;margin-right:6px}
-        @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.4)}50%{box-shadow:0 0 0 12px rgba(16,185,129,0)}}
-        .section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin:12px 0}
-        .section h3{font-size:13px;margin-bottom:10px;color:var(--tx2);text-transform:uppercase;letter-spacing:1px}
-        .btn{display:block;width:100%;padding:16px;border:none;border-radius:14px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin:8px 0;text-align:center;transition:all .2s}
-        .btn:active{transform:scale(.96)}
-        .btn-premium{background:linear-gradient(135deg,#10b981,#3b82f6,#8b5cf6);background-size:200% 200%;animation:gradient 3s ease infinite}
-        .btn-gold{background:linear-gradient(135deg,#f59e0b,#fbbf24)}
-        .btn-green{background:var(--grn)}
-        .toggle-row{display:flex;justify-content:space-between;align-items:center;padding:14px;background:var(--bg);border-radius:12px;margin:8px 0}
-        .toggle{width:52px;height:28px;background:var(--border);border-radius:14px;cursor:pointer;transition:background .3s}
-        .toggle.on{background:var(--grn)}
-        .toggle div{width:24px;height:24px;background:#fff;border-radius:50%;margin:2px;transition:transform .3s}
-        .toggle.on div{transform:translateX(24px)}
-        .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-        .stat-card{background:var(--bg);border-radius:12px;padding:12px;text-align:center;border:1px solid transparent;transition:border-color .3s}
-        .stat-card:hover{border-color:var(--blu)}
-        .stat-card .value{font-size:22px;font-weight:800}
-        .stat-card .label{font-size:9px;color:var(--tx2);text-transform:uppercase;letter-spacing:1px}
-        .grn{color:var(--grn)}.gld{color:var(--gld)}.blu{color:var(--blu)}.ppl{color:var(--ppl)}
-        .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--blu);color:#fff;padding:12px 24px;border-radius:24px;font-weight:600;font-size:13px;z-index:999;animation:fadeIn .3s ease}
-        @keyframes fadeIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+        :root {
+            --bg: #0a0e17; --card: #111827; --border: #1f2937;
+            --green: #10b981; --red: #ef4444; --blue: #3b82f6;
+            --gold: #f59e0b; --purple: #8b5cf6; --text: #e5e7eb; --text2: #9ca3af;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg); color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-height: 100vh; padding-bottom: calc(80px + var(--safe-bottom));
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Страницы */
+        .page { display: none; padding: 16px; animation: fadeIn 0.3s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Шапка */
+        .header { text-align: center; padding: 20px 0 12px; }
+        .logo {
+            width: 56px; height: 56px; margin: 0 auto 8px;
+            background: linear-gradient(135deg, #10b981, #3b82f6, #8b5cf6);
+            border-radius: 16px; display: flex; align-items: center; justify-content: center;
+            font-size: 28px; box-shadow: 0 4px 20px rgba(16,185,129,0.3);
+        }
+        h1 { font-size: 20px; font-weight: 800; }
+        .live { color: var(--green); font-size: 11px; }
+        .live-dot { display: inline-block; width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; margin-right: 4px; }
+        @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.4)} 50%{box-shadow:0 0 0 10px rgba(16,185,129,0)} }
+
+        /* Карточки */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+        .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px; text-align: center; }
+        .stat-card .value { font-size: 22px; font-weight: 800; }
+        .stat-card .label { font-size: 9px; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; }
+        .green { color: var(--green); } .gold { color: var(--gold); } .blue { color: var(--blue); } .purple { color: var(--purple); }
+
+        /* Кнопки */
+        .btn {
+            display: block; width: 100%; padding: 14px; border: none; border-radius: 14px;
+            color: white; font-size: 14px; font-weight: 700; cursor: pointer; margin: 6px 0;
+            text-align: center; transition: all 0.2s;
+        }
+        .btn:active { transform: scale(0.96); }
+        .btn-premium { background: linear-gradient(135deg, #10b981, #3b82f6, #8b5cf6); background-size: 200% 200%; animation: gradient 3s ease infinite; }
+        @keyframes gradient { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+        .btn-green { background: var(--green); }
+        .btn-gold { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+        .btn-red { background: var(--red); }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+
+        /* Секции */
+        .section { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin: 10px 0; }
+        .section h3 { font-size: 12px; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+
+        /* Переключатели */
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg); border-radius: 12px; margin: 6px 0; }
+        .toggle { width: 48px; height: 26px; background: var(--border); border-radius: 13px; cursor: pointer; transition: background 0.3s; position: relative; }
+        .toggle.on { background: var(--green); }
+        .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; background: white; border-radius: 50%; transition: transform 0.3s; }
+        .toggle.on::after { transform: translateX(22px); }
+
+        /* Лог мыслей */
+        .thought-log { max-height: 300px; overflow-y: auto; font-size: 11px; line-height: 1.6; }
+        .thought-log::-webkit-scrollbar { width: 4px; }
+        .thought-log::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+        .thought-item { padding: 6px 0; border-bottom: 1px solid var(--border); animation: fadeIn 0.5s ease; }
+        .thought-item .time { color: var(--text2); font-size: 9px; }
+        .thought-item .emoji { margin-right: 4px; }
+
+        /* Сигналы */
+        .signal-card { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin: 8px 0; }
+        .signal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .signal-pair { font-weight: 700; font-size: 14px; }
+        .signal-dir { font-weight: 800; font-size: 14px; }
+        .signal-info { font-size: 10px; color: var(--text2); }
+
+        /* Нижнее меню */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: var(--card); border-top: 1px solid var(--border);
+            display: flex; justify-content: space-around; padding: 6px 0;
+            padding-bottom: calc(6px + var(--safe-bottom)); z-index: 100;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 2px;
+            cursor: pointer; padding: 4px 10px; color: var(--text2); font-size: 9px;
+            transition: color 0.2s;
+        }
+        .nav-item.active { color: var(--blue); }
+        .nav-item .icon { font-size: 20px; }
+
+        /* Прогресс-бар */
+        .progress-bar { height: 18px; background: var(--border); border-radius: 9px; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 9px; transition: width 0.8s ease; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: white; }
+
+        /* Toast */
+        .toast {
+            position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+            background: var(--blue); color: white; padding: 10px 20px;
+            border-radius: 20px; font-weight: 600; font-size: 12px;
+            z-index: 999; animation: toastIn 0.3s ease;
+        }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(-10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+        /* Спиннер */
+        .spinner {
+            display: inline-block; width: 16px; height: 16px;
+            border: 2px solid var(--border); border-top-color: var(--blue);
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
+
+<!-- ====== ГЛАВНАЯ ====== -->
+<div class="page active" id="page-home">
     <div class="header">
         <div class="logo">🏆</div>
-        <h1>ULTRA Premium</h1>
-        <p class="subtitle"><span class="live-dot"></span>Live • Bot v11.0 • Премиум</p>
+        <h1>ULTRA Smart Money</h1>
+        <p class="live"><span class="live-dot"></span>Live • v11.0 Premium</p>
     </div>
 
-    <button class="btn btn-premium" onclick="sendCmd('get_stats')">📊 ЗАПРОСИТЬ СТАТИСТИКУ</button>
-    <button class="btn btn-gold" onclick="sendCmd('forex')">💱 ЗАПРОСИТЬ FOREX СИГНАЛ</button>
-    <button class="btn btn-green" onclick="sendCmd('otc')">💎 ЗАПРОСИТЬ OTC СИГНАЛ</button>
-
     <div class="section">
-        <h3>🤖 АВТО-ТРЕЙДИНГ</h3>
+        <div class="stats-grid">
+            <div class="stat-card"><div class="label">Сделок</div><div class="value gold" id="t">—</div></div>
+            <div class="stat-card"><div class="label">Винрейт</div><div class="value green" id="w">—</div></div>
+            <div class="stat-card"><div class="label">CALL</div><div class="value blue" id="c">—</div></div>
+            <div class="stat-card"><div class="label">PUT</div><div class="value purple" id="p">—</div></div>
+        </div>
+    </div>
+
+    <button class="btn btn-premium" onclick="requestStats()">📊 ЗАПРОСИТЬ СТАТИСТИКУ</button>
+    <button class="btn btn-green" onclick="startSearch('forex')">💱 ПОИСК FOREX СИГНАЛОВ</button>
+    <button class="btn btn-gold" onclick="startSearch('otc')">💎 ПОИСК OTC СИГНАЛОВ</button>
+    <button class="btn btn-outline" onclick="openPage('auto')">🤖 АВТО-ТРЕЙДИНГ</button>
+    <button class="btn btn-outline" onclick="openPage('log')">🧠 ХОД РАЗМЫШЛЕНИЙ БОТА</button>
+    <button class="btn btn-outline" onclick="openPage('signals')">📋 ПОСЛЕДНИЕ СИГНАЛЫ</button>
+</div>
+
+<!-- ====== АВТО-ТРЕЙДИНГ ====== -->
+<div class="page" id="page-auto">
+    <div class="header"><h2>🤖 Авто-трейдинг</h2></div>
+    <div class="section">
+        <h3>Управление</h3>
         <div class="toggle-row">
             <span>💱 Forex Auto</span>
-            <div class="toggle" id="tf" onclick="toggleAuto('forex')"><div></div></div>
+            <div class="toggle" id="tf" onclick="toggleAuto('forex')"></div>
         </div>
         <div class="toggle-row">
             <span>💎 OTC Auto</span>
-            <div class="toggle" id="to" onclick="toggleAuto('otc')"><div></div></div>
+            <div class="toggle" id="to" onclick="toggleAuto('otc')"></div>
         </div>
     </div>
+    <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
+</div>
 
+<!-- ====== ХОД РАЗМЫШЛЕНИЙ ====== -->
+<div class="page" id="page-log">
+    <div class="header"><h2>🧠 Ход размышлений</h2></div>
     <div class="section">
-        <h3>📊 БЫСТРАЯ СТАТИСТИКА</h3>
-        <div class="stats-grid">
-            <div class="stat-card"><div class="label">Сделок</div><div class="value gld" id="t">—</div></div>
-            <div class="stat-card"><div class="label">Винрейт</div><div class="value grn" id="w">—</div></div>
-            <div class="stat-card"><div class="label">CALL</div><div class="value blu" id="c">—</div></div>
-            <div class="stat-card"><div class="label">PUT</div><div class="value ppl" id="p">—</div></div>
+        <h3>Бот анализирует рынок...</h3>
+        <div class="thought-log" id="thoughtLog">
+            <div class="thought-item">
+                <span class="time">только что</span><br>
+                <span class="emoji">🟢</span> Бот запущен. Начинаю мониторинг рынка...
+            </div>
         </div>
     </div>
+    <button class="btn btn-green" onclick="startSearch('forex')">💱 ЗАПУСТИТЬ ПОИСК FOREX</button>
+    <button class="btn btn-gold" onclick="startSearch('otc')">💎 ЗАПУСТИТЬ ПОИСК OTC</button>
+    <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
+</div>
 
-    <script>
-        const tg = window.Telegram?.WebApp;
-        if(tg) tg.expand();
-        let af=false, ao=false;
+<!-- ====== СИГНАЛЫ ====== -->
+<div class="page" id="page-signals">
+    <div class="header"><h2>📋 Последние сигналы</h2></div>
+    <div class="section" id="signalsList">
+        <div class="signal-card">
+            <div class="signal-header"><span class="signal-pair">Нет сигналов</span></div>
+            <div class="signal-info">Нажмите поиск на главной</div>
+        </div>
+    </div>
+    <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
+</div>
+
+<!-- ====== НИЖНЕЕ МЕНЮ ====== -->
+<div class="bottom-nav">
+    <div class="nav-item active" onclick="openPage('home')"><span class="icon">🏠</span>Главная</div>
+    <div class="nav-item" onclick="openPage('auto')"><span class="icon">🤖</span>Авто</div>
+    <div class="nav-item" onclick="openPage('log')"><span class="icon">🧠</span>Мысли</div>
+    <div class="nav-item" onclick="openPage('signals')"><span class="icon">📋</span>Сигналы</div>
+</div>
+
+<script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) tg.expand();
+
+    let autoF = false, autoO = false;
+    let thoughtCount = 1;
+
+    // Навигация
+    function openPage(name) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page-' + name).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach((n, i) => {
+            n.classList.remove('active');
+            const pages = ['home', 'auto', 'log', 'signals'];
+            if (pages[i] === name) n.classList.add('active');
+        });
+        window.scrollTo(0, 0);
+        if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+    }
+
+    // Toast
+    function showToast(msg) {
+        const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+        document.body.appendChild(t); setTimeout(() => t.remove(), 1500);
+    }
+
+    // Запрос статистики
+    function requestStats() {
+        if (tg) { tg.sendData(JSON.stringify({get_stats: true})); tg.close(); }
+        showToast('📊 Статистика запрошена!');
+    }
+
+    // Поиск сигналов с мыслями
+    function startSearch(market) {
+        const name = market === 'forex' ? 'Forex' : 'OTC';
+        const emoji = market === 'forex' ? '💱' : '💎';
         
-        function showToast(msg){
-            const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
-            document.body.appendChild(t); setTimeout(()=>t.remove(),1500);
-        }
+        // Открываем лог мыслей
+        openPage('log');
         
-        function sendCmd(cmd){
-            if(cmd==='get_stats'){
-                if(tg) tg.sendData(JSON.stringify({get_stats:true}));
-                showToast('📊 Статистика запрошена!');
-            } else {
-                if(tg){ tg.sendData(JSON.stringify({request_signal:cmd})); tg.close(); }
-                showToast('🔥 Сигнал запрошен!');
-            }
-        }
+        // Добавляем мысли
+        addThought(emoji, `Запускаю поиск сигналов ${name}...`);
         
-        function toggleAuto(type){
-            if(type==='forex'){
-                af=!af; document.getElementById('tf').classList.toggle('on',af);
-                if(tg) tg.sendData(JSON.stringify({auto_forex:af}));
-                showToast('Forex: '+(af?'🟢 ВКЛ':'🔴 ВЫКЛ'));
-            } else {
-                ao=!ao; document.getElementById('to').classList.toggle('on',ao);
-                if(tg) tg.sendData(JSON.stringify({auto_otc:ao}));
-                showToast('OTC: '+(ao?'🟢 ВКЛ':'🔴 ВЫКЛ'));
-            }
+        setTimeout(() => addThought('🔍', `Загружаю данные M5 для всех пар ${name}...`), 800);
+        setTimeout(() => addThought('📊', `Анализирую тренды на H1, H4...`), 1600);
+        setTimeout(() => addThought('🧠', `Ищу FVG паттерны и Order Blocks...`), 2400);
+        setTimeout(() => addThought('⚡', `Проверяю конфлюэнс и объёмы...`), 3200);
+        setTimeout(() => {
+            addThought('✅', `Анализ ${name} завершён! Отправляю запрос боту...`);
+            // Отправляем запрос боту
+            if (tg) { tg.sendData(JSON.stringify({request_signal: market})); tg.close(); }
+            showToast(`🔥 Сигнал ${name} запрошен!`);
+        }, 4000);
+
+        // Отправляем запрос сразу (бот пришлёт сигналы в чат)
+        if (tg) tg.sendData(JSON.stringify({request_signal: market}));
+    }
+
+    // Добавление мысли в лог
+    function addThought(emoji, text) {
+        const log = document.getElementById('thoughtLog');
+        const item = document.createElement('div');
+        item.className = 'thought-item';
+        item.innerHTML = `<span class="time">${new Date().toLocaleTimeString()}</span><br><span class="emoji">${emoji}</span> ${text}`;
+        log.insertBefore(item, log.firstChild);
+        thoughtCount++;
+        if (thoughtCount > 50) log.lastChild.remove();
+    }
+
+    // Автотрейдинг
+    function toggleAuto(type) {
+        if (type === 'forex') {
+            autoF = !autoF;
+            document.getElementById('tf').classList.toggle('on', autoF);
+            if (tg) tg.sendData(JSON.stringify({auto_forex: autoF}));
+            addThought('🤖', `Автотрейдинг Forex: ${autoF ? 'ВКЛЮЧЕН' : 'ОТКЛЮЧЕН'}`);
+            showToast('Forex: ' + (autoF ? '🟢 ВКЛ' : '🔴 ВЫКЛ'));
+        } else {
+            autoO = !autoO;
+            document.getElementById('to').classList.toggle('on', autoO);
+            if (tg) tg.sendData(JSON.stringify({auto_otc: autoO}));
+            addThought('🤖', `Автотрейдинг OTC: ${autoO ? 'ВКЛЮЧЕН' : 'ОТКЛЮЧЕН'}`);
+            showToast('OTC: ' + (autoO ? '🟢 ВКЛ' : '🔴 ВЫКЛ'));
         }
-    </script>
+    }
+
+    // Имитация мыслей при запуске
+    setTimeout(() => addThought('🟢', 'Мониторинг рынка активен...'), 2000);
+    setTimeout(() => addThought('🌍', `Сессия: ${new Date().getHours() < 22 ? 'Активна' : 'Завершена'}`), 4000);
+    setInterval(() => {
+        const thoughts = [
+            'Проверяю уровни поддержки/сопротивления...',
+            'Анализирую объёмы торгов...',
+            'Ищу дивергенции RSI...',
+            'Проверяю новостной фон...',
+            'Сканирую старшие таймфреймы...',
+            'Оцениваю волатильность рынка...',
+        ];
+        addThought('🔄', thoughts[Math.floor(Math.random() * thoughts.length)]);
+    }, 15000);
+</script>
 </body>
 </html>
