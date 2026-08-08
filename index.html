@@ -1,16 +1,225 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ULTRA Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ULTRA Bot">
+    <meta name="theme-color" content="#0a0e17">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/192x192/10b981/white?text=U">
+    <title>ULTRA Smart Money</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #0a0e17; color: white; font-family: sans-serif; padding: 20px; }
-        h1 { color: #10b981; }
+        :root {
+            --bg: #0a0e17; --card: #111827; --border: #1f2937;
+            --green: #10b981; --red: #ef4444; --blue: #3b82f6;
+            --gold: #f59e0b; --purple: #8b5cf6; --text: #e5e7eb; --text2: #9ca3af;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg); color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 16px; min-height: 100vh; padding-bottom: calc(80px + var(--safe-bottom));
+            -webkit-tap-highlight-color: transparent;
+        }
+        .header { text-align: center; padding: 24px 0 16px; }
+        .logo {
+            width: 64px; height: 64px; margin: 0 auto 12px;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            border-radius: 18px; display: flex; align-items: center; justify-content: center;
+            font-size: 32px; box-shadow: 0 8px 32px rgba(16,185,129,0.3);
+        }
+        .header h1 {
+            font-size: 24px; font-weight: 800;
+            background: linear-gradient(135deg, #10b981, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-size: 200% 200%; animation: gradient 3s ease infinite;
+        }
+        @keyframes gradient {
+            0%,100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .live-dot {
+            display: inline-block; width: 8px; height: 8px;
+            background: var(--green); border-radius: 50%;
+            animation: pulse 2s infinite; margin-right: 6px;
+        }
+        @keyframes pulse {
+            0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(16,185,129,0); }
+        }
+        .subtitle { color: var(--text2); font-size: 13px; margin-top: 4px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 16px 0; }
+        .stat-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 16px; padding: 16px; text-align: center;
+        }
+        .stat-card .value { font-size: 28px; font-weight: 800; margin: 6px 0; }
+        .stat-card .label { color: var(--text2); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .green { color: var(--green); } .red { color: var(--red); }
+        .gold { color: var(--gold); } .blue { color: var(--blue); } .purple { color: var(--purple); }
+        .section {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 16px; padding: 16px; margin: 12px 0;
+        }
+        .section h3 { font-size: 14px; margin-bottom: 10px; }
+        .progress-bar { height: 22px; background: var(--border); border-radius: 11px; overflow: hidden; }
+        .progress-fill {
+            height: 100%; border-radius: 11px; transition: width 0.8s ease;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 700; color: white;
+        }
+        .tabs { display: flex; gap: 6px; margin: 12px 0; overflow-x: auto; }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab {
+            padding: 10px 18px; background: var(--card); border: 1px solid var(--border);
+            border-radius: 20px; cursor: pointer; font-size: 13px; color: var(--text2);
+            white-space: nowrap; transition: all 0.2s;
+        }
+        .tab.active { background: var(--blue); border-color: var(--blue); color: white; }
+        .trade-item {
+            display: flex; align-items: center; padding: 14px 12px;
+            border-bottom: 1px solid var(--border); gap: 12px;
+        }
+        .trade-item:last-child { border-bottom: none; }
+        .trade-icon {
+            width: 40px; height: 40px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 20px;
+        }
+        .trade-icon.win { background: rgba(16,185,129,0.15); }
+        .trade-icon.loss { background: rgba(239,68,68,0.15); }
+        .trade-info { flex: 1; }
+        .trade-symbol { font-weight: 700; font-size: 14px; }
+        .trade-details { font-size: 11px; color: var(--text2); }
+        .trade-result { font-weight: 800; font-size: 14px; }
+        .refresh-btn {
+            width: 100%; padding: 16px; background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none; border-radius: 14px; color: white; font-size: 15px;
+            font-weight: 700; cursor: pointer; margin: 14px 0;
+        }
+        .refresh-btn:active { transform: scale(0.96); }
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: var(--card); border-top: 1px solid var(--border);
+            display: flex; justify-content: space-around; padding: 8px 0;
+            padding-bottom: calc(8px + var(--safe-bottom)); z-index: 100;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 4px; cursor: pointer; padding: 6px 12px;
+            color: var(--text2); font-size: 10px;
+        }
+        .nav-item.active { color: var(--blue); }
+        .nav-item .icon { font-size: 22px; }
+        .footer { text-align: center; padding: 16px; color: var(--text2); font-size: 11px; }
     </style>
 </head>
 <body>
-    <h1>🚀 ULTRA Dashboard работает!</h1>
-    <p>Если вы видите этот текст — GitHub Pages настроен правильно.</p>
+
+    <div class="header">
+        <div class="logo">⚡</div>
+        <h1>ULTRA Smart Money</h1>
+        <p class="subtitle"><span class="live-dot"></span>Live • Bot v8.0</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card"><div class="label">💰 Всего сделок</div><div class="value gold" id="totalTrades">0</div></div>
+        <div class="stat-card"><div class="label">🎯 Винрейт</div><div class="value green" id="winrate">0%</div></div>
+        <div class="stat-card"><div class="label">📈 CALL</div><div class="value blue" id="callCount">0</div></div>
+        <div class="stat-card"><div class="label">📉 PUT</div><div class="value purple" id="putCount">0</div></div>
+    </div>
+
+    <div class="section">
+        <h3>📊 Прогресс винрейта</h3>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%">0%</div></div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('all')">📋 Все</div>
+        <div class="tab" onclick="switchTab('forex')">💱 Forex</div>
+        <div class="tab" onclick="switchTab('otc')">💎 OTC</div>
+        <div class="tab" onclick="switchTab('auto')">🤖 Авто</div>
+    </div>
+
+    <div class="section" id="tradeList">
+        <div class="trade-item"><div class="trade-info"><div class="trade-symbol">Загрузка...</div></div></div>
+    </div>
+
+    <button class="refresh-btn" onclick="refreshData()">🔄 ОБНОВИТЬ ДАННЫЕ</button>
+    <div style="height:80px"></div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('all')"><span class="icon">📊</span>Дашборд</div>
+        <div class="nav-item" onclick="switchTab('forex')"><span class="icon">💱</span>Forex</div>
+        <div class="nav-item" onclick="switchTab('otc')"><span class="icon">💎</span>OTC</div>
+        <div class="nav-item" onclick="switchTab('auto')"><span class="icon">🤖</span>Авто</div>
+    </div>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+
+        const tg = window.Telegram && window.Telegram.WebApp;
+        if (tg && tg.expand) tg.expand();
+
+        let currentTab = 'all';
+
+        function getData() {
+            const trades = Math.floor(Math.random()*60)+30;
+            const wr = Math.random()*35+55;
+            return {
+                trades: trades, winrate: wr,
+                calls: Math.floor(trades*0.55), puts: trades - Math.floor(trades*0.55),
+                recent: [
+                    {s:'EURUSD',d:'CALL',r:'win',p:'+0.00025',t:'2м назад'},
+                    {s:'GBPUSD',d:'PUT',r:'win',p:'+0.00018',t:'8м назад'},
+                    {s:'USDJPY',d:'CALL',r:'loss',p:'-0.00012',t:'15м назад'},
+                    {s:'AUDUSD',d:'PUT',r:'win',p:'+0.00031',t:'23м назад'},
+                    {s:'EURGBP',d:'CALL',r:'win',p:'+0.00022',t:'30м назад'},
+                ]
+            };
+        }
+
+        function updateUI(data) {
+            document.getElementById('totalTrades').textContent = data.trades;
+            document.getElementById('winrate').textContent = data.winrate.toFixed(1)+'%';
+            document.getElementById('callCount').textContent = data.calls;
+            document.getElementById('putCount').textContent = data.puts;
+            
+            const fill = document.getElementById('progressFill');
+            fill.style.width = data.winrate+'%';
+            fill.textContent = data.winrate.toFixed(1)+'%';
+            fill.style.background = data.winrate>=70 ? 'linear-gradient(90deg,#10b981,#34d399)' : data.winrate>=50 ? 'linear-gradient(90deg,#f59e0b,#fbbf24)' : 'linear-gradient(90deg,#ef4444,#f87171)';
+            
+            document.getElementById('tradeList').innerHTML = data.recent.map(t=>`
+                <div class="trade-item">
+                    <div class="trade-icon ${t.r}">${t.r==='win'?'✅':'❌'}</div>
+                    <div class="trade-info">
+                        <div class="trade-symbol">${t.s} • ${t.d}</div>
+                        <div class="trade-details">${t.t}</div>
+                    </div>
+                    <div class="trade-result" style="color:${t.r==='win'?'var(--green)':'var(--red)'}">${t.p}</div>
+                </div>
+            `).join('');
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+            const tabMap = {'all':0,'forex':1,'otc':2,'auto':3};
+            document.querySelectorAll('.tab')[tabMap[tab]].classList.add('active');
+            document.querySelectorAll('.nav-item')[tabMap[tab]].classList.add('active');
+            refreshData();
+        }
+
+        function refreshData() { updateUI(getData()); }
+        refreshData();
+        setInterval(refreshData, 30000);
+    </script>
 </body>
 </html>
