@@ -16,105 +16,92 @@
             --bg: #0a0e17; --card: #111827; --border: #1f2937;
             --green: #10b981; --red: #ef4444; --blue: #3b82f6;
             --gold: #f59e0b; --purple: #8b5cf6; --text: #e5e7eb; --text2: #9ca3af;
-            --safe-bottom: env(safe-area-inset-bottom, 0px);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: var(--bg); color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            padding: 16px; min-height: 100vh; padding-bottom: calc(80px + var(--safe-bottom));
-            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, sans-serif; padding: 16px;
+            min-height: 100vh; padding-bottom: 100px;
         }
-        .header { text-align: center; padding: 24px 0 16px; }
+        .header { text-align: center; padding: 20px 0; }
         .logo {
-            width: 64px; height: 64px; margin: 0 auto 12px;
+            width: 56px; height: 56px; margin: 0 auto 10px;
             background: linear-gradient(135deg, #10b981, #3b82f6);
-            border-radius: 18px; display: flex; align-items: center; justify-content: center;
-            font-size: 32px; box-shadow: 0 8px 32px rgba(16,185,129,0.3);
+            border-radius: 16px; display: flex; align-items: center; justify-content: center;
+            font-size: 28px;
         }
-        .header h1 {
-            font-size: 24px; font-weight: 800;
+        h1 {
+            font-size: 22px; font-weight: 800;
             background: linear-gradient(135deg, #10b981, #3b82f6, #8b5cf6);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-size: 200% 200%; animation: gradient 3s ease infinite;
         }
-        @keyframes gradient {
-            0%,100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
+        .subtitle { color: var(--text2); font-size: 12px; margin-top: 4px; }
         .live-dot {
-            display: inline-block; width: 8px; height: 8px;
-            background: var(--green); border-radius: 50%;
-            animation: pulse 2s infinite; margin-right: 6px;
+            display: inline-block; width: 6px; height: 6px;
+            background: var(--green); border-radius: 50%; margin-right: 4px;
+            animation: pulse 2s infinite;
         }
         @keyframes pulse {
             0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
-            50% { box-shadow: 0 0 0 12px rgba(16,185,129,0); }
+            50% { box-shadow: 0 0 0 8px rgba(16,185,129,0); }
         }
-        .subtitle { color: var(--text2); font-size: 13px; margin-top: 4px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 16px 0; }
-        .stat-card {
+        
+        /* Сетка кнопок */
+        .menu-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px 0;
+        }
+        .menu-btn {
             background: var(--card); border: 1px solid var(--border);
-            border-radius: 16px; padding: 16px; text-align: center;
+            border-radius: 14px; padding: 16px 12px; text-align: center;
+            cursor: pointer; transition: all 0.2s; text-decoration: none; color: var(--text);
         }
-        .stat-card .value { font-size: 28px; font-weight: 800; margin: 6px 0; }
-        .stat-card .label { color: var(--text2); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
-        .green { color: var(--green); } .red { color: var(--red); }
-        .gold { color: var(--gold); } .blue { color: var(--blue); } .purple { color: var(--purple); }
+        .menu-btn:active { transform: scale(0.95); border-color: var(--blue); }
+        .menu-btn .icon { font-size: 28px; display: block; margin-bottom: 6px; }
+        .menu-btn .label { font-size: 11px; font-weight: 600; }
+        
         .section {
             background: var(--card); border: 1px solid var(--border);
-            border-radius: 16px; padding: 16px; margin: 12px 0;
+            border-radius: 14px; padding: 14px; margin: 10px 0;
         }
-        .section h3 { font-size: 14px; margin-bottom: 10px; }
-        .progress-bar { height: 22px; background: var(--border); border-radius: 11px; overflow: hidden; }
+        .section h3 { font-size: 13px; margin-bottom: 8px; }
+        
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .stat-card {
+            background: var(--bg); border-radius: 10px; padding: 12px; text-align: center;
+        }
+        .stat-card .value { font-size: 22px; font-weight: 800; }
+        .stat-card .label { font-size: 9px; color: var(--text2); text-transform: uppercase; }
+        .green { color: var(--green); } .gold { color: var(--gold); }
+        .blue { color: var(--blue); } .purple { color: var(--purple); }
+        
+        .progress-bar { height: 16px; background: var(--border); border-radius: 8px; overflow: hidden; }
         .progress-fill {
-            height: 100%; border-radius: 11px; transition: width 0.8s ease;
+            height: 100%; border-radius: 8px; transition: width 0.8s;
             display: flex; align-items: center; justify-content: center;
-            font-size: 11px; font-weight: 700; color: white;
+            font-size: 10px; font-weight: 700; color: white;
         }
-        .tabs { display: flex; gap: 6px; margin: 12px 0; overflow-x: auto; }
-        .tabs::-webkit-scrollbar { display: none; }
-        .tab {
-            padding: 10px 18px; background: var(--card); border: 1px solid var(--border);
-            border-radius: 20px; cursor: pointer; font-size: 13px; color: var(--text2);
-            white-space: nowrap; transition: all 0.2s;
-        }
-        .tab.active { background: var(--blue); border-color: var(--blue); color: white; }
-        .trade-item {
-            display: flex; align-items: center; padding: 14px 12px;
-            border-bottom: 1px solid var(--border); gap: 12px;
-        }
-        .trade-item:last-child { border-bottom: none; }
-        .trade-icon {
-            width: 40px; height: 40px; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center; font-size: 20px;
-        }
-        .trade-icon.win { background: rgba(16,185,129,0.15); }
-        .trade-icon.loss { background: rgba(239,68,68,0.15); }
-        .trade-info { flex: 1; }
-        .trade-symbol { font-weight: 700; font-size: 14px; }
-        .trade-details { font-size: 11px; color: var(--text2); }
-        .trade-result { font-weight: 800; font-size: 14px; }
-        .refresh-btn {
-            width: 100%; padding: 16px; background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            border: none; border-radius: 14px; color: white; font-size: 15px;
-            font-weight: 700; cursor: pointer; margin: 14px 0;
-        }
-        .refresh-btn:active { transform: scale(0.96); }
+        
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
             background: var(--card); border-top: 1px solid var(--border);
             display: flex; justify-content: space-around; padding: 8px 0;
-            padding-bottom: calc(8px + var(--safe-bottom)); z-index: 100;
+            padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
         }
         .nav-item {
             display: flex; flex-direction: column; align-items: center;
-            gap: 4px; cursor: pointer; padding: 6px 12px;
-            color: var(--text2); font-size: 10px;
+            gap: 2px; cursor: pointer; padding: 4px 8px;
+            color: var(--text2); font-size: 9px;
         }
         .nav-item.active { color: var(--blue); }
-        .nav-item .icon { font-size: 22px; }
-        .footer { text-align: center; padding: 16px; color: var(--text2); font-size: 11px; }
+        .nav-item .icon { font-size: 20px; }
+        
+        .toast {
+            position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+            background: var(--blue); color: white; padding: 10px 20px;
+            border-radius: 20px; font-weight: 600; font-size: 13px;
+            z-index: 999; animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(-10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
     </style>
 </head>
 <body>
@@ -125,101 +112,102 @@
         <p class="subtitle"><span class="live-dot"></span>Live • Bot v8.0</p>
     </div>
 
-    <div class="stats-grid">
-        <div class="stat-card"><div class="label">💰 Всего сделок</div><div class="value gold" id="totalTrades">0</div></div>
-        <div class="stat-card"><div class="label">🎯 Винрейт</div><div class="value green" id="winrate">0%</div></div>
-        <div class="stat-card"><div class="label">📈 CALL</div><div class="value blue" id="callCount">0</div></div>
-        <div class="stat-card"><div class="label">📉 PUT</div><div class="value purple" id="putCount">0</div></div>
+    <!-- Кнопки управления -->
+    <div class="menu-grid">
+        <div class="menu-btn" onclick="sendCommand('dashboard')">
+            <span class="icon">📊</span>
+            <span class="label">ДАШБОРД</span>
+        </div>
+        <div class="menu-btn" onclick="sendCommand('forex_signal')">
+            <span class="icon">💱</span>
+            <span class="label">FOREX СИГНАЛ</span>
+        </div>
+        <div class="menu-btn" onclick="sendCommand('otc_signal')">
+            <span class="icon">💎</span>
+            <span class="label">OTC СИГНАЛ</span>
+        </div>
+        <div class="menu-btn" onclick="sendCommand('auto_trade')">
+            <span class="icon">🤖</span>
+            <span class="label">АВТОТРЕЙДИНГ</span>
+        </div>
+        <div class="menu-btn" onclick="sendCommand('history')">
+            <span class="icon">📜</span>
+            <span class="label">ИСТОРИЯ</span>
+        </div>
+        <div class="menu-btn" onclick="sendCommand('analytics')">
+            <span class="icon">📈</span>
+            <span class="label">АНАЛИТИКА</span>
+        </div>
+        <div class="menu-btn" onclick="sendCommand('fundamental')">
+            <span class="icon">📰</span>
+            <span class="label">ФУНДАМЕНТ</span>
+        </div>
+        <div class="menu-btn" onclick="sendCommand('settings')">
+            <span class="icon">⚙️</span>
+            <span class="label">НАСТРОЙКИ</span>
+        </div>
     </div>
 
+    <!-- Статистика -->
     <div class="section">
-        <h3>📊 Прогресс винрейта</h3>
-        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%">0%</div></div>
+        <h3>📊 Быстрая статистика</h3>
+        <div class="stats-grid">
+            <div class="stat-card"><div class="label">Сделок</div><div class="value gold" id="trades">0</div></div>
+            <div class="stat-card"><div class="label">Винрейт</div><div class="value green" id="wr">0%</div></div>
+            <div class="stat-card"><div class="label">CALL</div><div class="value blue" id="calls">0</div></div>
+            <div class="stat-card"><div class="label">PUT</div><div class="value purple" id="puts">0</div></div>
+        </div>
     </div>
 
-    <div class="tabs">
-        <div class="tab active" onclick="switchTab('all')">📋 Все</div>
-        <div class="tab" onclick="switchTab('forex')">💱 Forex</div>
-        <div class="tab" onclick="switchTab('otc')">💎 OTC</div>
-        <div class="tab" onclick="switchTab('auto')">🤖 Авто</div>
+    <!-- Прогресс -->
+    <div class="section">
+        <h3>Прогресс винрейта</h3>
+        <div class="progress-bar"><div class="progress-fill" id="fill" style="width:0%">0%</div></div>
     </div>
 
-    <div class="section" id="tradeList">
-        <div class="trade-item"><div class="trade-info"><div class="trade-symbol">Загрузка...</div></div></div>
-    </div>
-
-    <button class="refresh-btn" onclick="refreshData()">🔄 ОБНОВИТЬ ДАННЫЕ</button>
-    <div style="height:80px"></div>
-
+    <!-- Нижнее меню -->
     <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('all')"><span class="icon">📊</span>Дашборд</div>
-        <div class="nav-item" onclick="switchTab('forex')"><span class="icon">💱</span>Forex</div>
-        <div class="nav-item" onclick="switchTab('otc')"><span class="icon">💎</span>OTC</div>
-        <div class="nav-item" onclick="switchTab('auto')"><span class="icon">🤖</span>Авто</div>
+        <div class="nav-item active" onclick="refreshStats()"><span class="icon">🔄</span>Обновить</div>
+        <div class="nav-item" onclick="sendCommand('dashboard')"><span class="icon">📊</span>Дашборд</div>
+        <div class="nav-item" onclick="sendCommand('forex_signal')"><span class="icon">💱</span>Forex</div>
+        <div class="nav-item" onclick="sendCommand('otc_signal')"><span class="icon">💎</span>OTC</div>
     </div>
 
     <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
-        }
-
         const tg = window.Telegram && window.Telegram.WebApp;
         if (tg && tg.expand) tg.expand();
 
-        let currentTab = 'all';
-
-        function getData() {
-            const trades = Math.floor(Math.random()*60)+30;
-            const wr = Math.random()*35+55;
-            return {
-                trades: trades, winrate: wr,
-                calls: Math.floor(trades*0.55), puts: trades - Math.floor(trades*0.55),
-                recent: [
-                    {s:'EURUSD',d:'CALL',r:'win',p:'+0.00025',t:'2м назад'},
-                    {s:'GBPUSD',d:'PUT',r:'win',p:'+0.00018',t:'8м назад'},
-                    {s:'USDJPY',d:'CALL',r:'loss',p:'-0.00012',t:'15м назад'},
-                    {s:'AUDUSD',d:'PUT',r:'win',p:'+0.00031',t:'23м назад'},
-                    {s:'EURGBP',d:'CALL',r:'win',p:'+0.00022',t:'30м назад'},
-                ]
-            };
+        function showToast(msg) {
+            const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+            document.body.appendChild(t); setTimeout(() => t.remove(), 1500);
         }
 
-        function updateUI(data) {
-            document.getElementById('totalTrades').textContent = data.trades;
-            document.getElementById('winrate').textContent = data.winrate.toFixed(1)+'%';
-            document.getElementById('callCount').textContent = data.calls;
-            document.getElementById('putCount').textContent = data.puts;
+        function sendCommand(cmd) {
+            if (tg) {
+                tg.sendData(JSON.stringify({command: cmd}));
+                tg.close();
+            }
+            showToast('Команда отправлена: ' + cmd);
+        }
+
+        function refreshStats() {
+            const t = Math.floor(Math.random()*60)+30;
+            const w = Math.random()*35+55;
+            document.getElementById('trades').textContent = t;
+            document.getElementById('wr').textContent = w.toFixed(1)+'%';
+            document.getElementById('calls').textContent = Math.floor(t*0.55);
+            document.getElementById('puts').textContent = t - Math.floor(t*0.55);
             
-            const fill = document.getElementById('progressFill');
-            fill.style.width = data.winrate+'%';
-            fill.textContent = data.winrate.toFixed(1)+'%';
-            fill.style.background = data.winrate>=70 ? 'linear-gradient(90deg,#10b981,#34d399)' : data.winrate>=50 ? 'linear-gradient(90deg,#f59e0b,#fbbf24)' : 'linear-gradient(90deg,#ef4444,#f87171)';
+            const f = document.getElementById('fill');
+            f.style.width = w+'%'; f.textContent = w.toFixed(1)+'%';
+            f.style.background = w>=70 ? '#10b981' : w>=50 ? '#f59e0b' : '#ef4444';
             
-            document.getElementById('tradeList').innerHTML = data.recent.map(t=>`
-                <div class="trade-item">
-                    <div class="trade-icon ${t.r}">${t.r==='win'?'✅':'❌'}</div>
-                    <div class="trade-info">
-                        <div class="trade-symbol">${t.s} • ${t.d}</div>
-                        <div class="trade-details">${t.t}</div>
-                    </div>
-                    <div class="trade-result" style="color:${t.r==='win'?'var(--green)':'var(--red)'}">${t.p}</div>
-                </div>
-            `).join('');
+            if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+            showToast('Обновлено ✅');
         }
 
-        function switchTab(tab) {
-            currentTab = tab;
-            document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-            const tabMap = {'all':0,'forex':1,'otc':2,'auto':3};
-            document.querySelectorAll('.tab')[tabMap[tab]].classList.add('active');
-            document.querySelectorAll('.nav-item')[tabMap[tab]].classList.add('active');
-            refreshData();
-        }
-
-        function refreshData() { updateUI(getData()); }
-        refreshData();
-        setInterval(refreshData, 30000);
+        refreshStats();
+        setInterval(refreshStats, 30000);
     </script>
 </body>
 </html>
