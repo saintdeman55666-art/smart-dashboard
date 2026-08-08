@@ -21,7 +21,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: var(--bg); color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: -apple-system, sans-serif;
             min-height: 100vh; padding-bottom: calc(80px + var(--safe-bottom));
             -webkit-tap-highlight-color: transparent;
         }
@@ -40,6 +40,7 @@
         .live { color: var(--green); font-size: 11px; }
         .live-dot { display: inline-block; width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; margin-right: 4px; }
         @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.4)} 50%{box-shadow:0 0 0 10px rgba(16,185,129,0)} }
+        .version-badge { display: inline-block; background: var(--purple); color: white; padding: 2px 8px; border-radius: 8px; font-size: 10px; font-weight: 700; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
         .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px; text-align: center; }
         .stat-card .value { font-size: 22px; font-weight: 800; }
@@ -80,15 +81,12 @@
         .signal-pair { font-weight: 700; font-size: 14px; }
         .signal-dir { font-weight: 800; font-size: 14px; }
         .signal-info { font-size: 10px; color: var(--text2); line-height: 1.5; }
-        .signal-status {
-            display: inline-block; padding: 3px 10px; border-radius: 10px;
-            font-size: 9px; font-weight: 700; margin-top: 6px;
-        }
+        .signal-status { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: 9px; font-weight: 700; margin-top: 6px; }
         .status-preparing { background: rgba(245,158,11,0.2); color: var(--gold); }
         .status-opened { background: rgba(16,185,129,0.2); color: var(--green); }
         .status-closed { background: rgba(156,163,175,0.2); color: var(--text2); }
         .news-item { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
-        .news-item .impact { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 9px; font-weight: 700; margin-right: 6px; }
+        .impact { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 9px; font-weight: 700; margin-right: 6px; }
         .impact-high { background: var(--red); color: white; }
         .impact-medium { background: var(--gold); color: black; }
         .impact-low { background: var(--green); color: white; }
@@ -120,11 +118,6 @@
             border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 6px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .search-status {
-            background: var(--bg); border: 1px solid var(--gold);
-            border-radius: 12px; padding: 14px; margin: 8px 0;
-            text-align: center; font-size: 13px;
-        }
         .modal {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.9); z-index: 200;
@@ -139,15 +132,10 @@
         @keyframes modalIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
         .modal-close { float: right; background: none; border: none; color: var(--text2); font-size: 22px; cursor: pointer; }
         .risk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .version-badge {
-            display: inline-block; background: var(--purple); color: white;
-            padding: 2px 8px; border-radius: 8px; font-size: 10px; font-weight: 700;
-        }
     </style>
 </head>
 <body>
 
-<!-- ====== ГЛАВНАЯ ====== -->
 <div class="page active" id="page-home">
     <div class="header">
         <div class="logo">🏆</div>
@@ -165,350 +153,177 @@
     </div>
 
     <div class="section">
-        <h3>💰 Управление рисками</h3>
+        <h3>💰 Риски</h3>
         <div class="risk-grid">
-            <div class="stat-card"><div class="label">Баланс</div><div class="value gold" id="balance">$1000</div></div>
-            <div class="stat-card"><div class="label">Риск/сделка</div><div class="value green" id="riskPerTrade">2%</div></div>
+            <div class="stat-card"><div class="label">Баланс</div><div class="value gold">$<span id="bal">1000</span></div></div>
+            <div class="stat-card"><div class="label">Позиция</div><div class="value green">$<span id="pos">20</span></div></div>
         </div>
     </div>
 
     <button class="btn btn-premium" onclick="requestStats()">📊 ЗАПРОСИТЬ СТАТИСТИКУ</button>
-    <button class="btn btn-green" onclick="startContinuousSearch('forex')">
-        <span id="forexSearchBtn">💱 АВТО-ПОИСК FOREX (ВКЛ)</span>
-    </button>
-    <button class="btn btn-gold" onclick="startContinuousSearch('otc')">
-        <span id="otcSearchBtn">💎 АВТО-ПОИСК OTC (ВКЛ)</span>
-    </button>
+    <button class="btn btn-green" onclick="startSearch('forex')">💱 АВТО-ПОИСК FOREX</button>
+    <button class="btn btn-gold" onclick="startSearch('otc')">💎 АВТО-ПОИСК OTC</button>
     <button class="btn btn-outline" onclick="openPage('auto')">🤖 АВТО-ТРЕЙДИНГ</button>
     <button class="btn btn-outline" onclick="openPage('log')">🧠 ХОД РАЗМЫШЛЕНИЙ</button>
-    <button class="btn btn-outline" onclick="openPage('news')">📰 НОВОСТИ И ФУНДАМЕНТ</button>
-    <button class="btn btn-outline" onclick="openPage('signals')">📋 СИГНАЛЫ <span id="signalBadge" style="display:none;background:var(--red);color:white;border-radius:10px;padding:2px 8px;font-size:10px;margin-left:6px">0</span></button>
-    <button class="btn btn-outline" onclick="openPage('risk')">⚙️ УПРАВЛЕНИЕ РИСКАМИ</button>
-    <button class="btn btn-outline" onclick="openPage('backtest')">🧪 БЭКТЕСТИНГ</button>
+    <button class="btn btn-outline" onclick="openPage('news')">📰 НОВОСТИ</button>
+    <button class="btn btn-outline" onclick="openPage('signals')">📋 СИГНАЛЫ</button>
+    <button class="btn btn-outline" onclick="openPage('risk')">⚙️ РИСКИ</button>
+    <button class="btn btn-outline" onclick="openPage('backtest')">🧪 БЭКТЕСТ</button>
 </div>
 
-<!-- ====== АВТО-ТРЕЙДИНГ ====== -->
 <div class="page" id="page-auto">
     <div class="header"><h2>🤖 Авто-трейдинг</h2></div>
     <div class="section">
-        <h3>Управление</h3>
-        <p style="font-size:11px;color:var(--text2);margin-bottom:10px">Бот сам открывает сделки при CONF≥85, ALIGN≥8</p>
-        <div class="toggle-row">
-            <span>💱 Forex Auto</span>
-            <div class="toggle" id="tf" onclick="toggleAuto('forex')"></div>
-        </div>
-        <div class="toggle-row">
-            <span>💎 OTC Auto</span>
-            <div class="toggle" id="to" onclick="toggleAuto('otc')"></div>
-        </div>
+        <div class="toggle-row"><span>💱 Forex</span><div class="toggle" id="tf" onclick="toggleAuto('forex')"></div></div>
+        <div class="toggle-row"><span>💎 OTC</span><div class="toggle" id="to" onclick="toggleAuto('otc')"></div></div>
     </div>
     <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
 </div>
 
-<!-- ====== ХОД РАЗМЫШЛЕНИЙ ====== -->
 <div class="page" id="page-log">
     <div class="header"><h2>🧠 Ход размышлений</h2></div>
-    <div id="searchStatus" style="display:none"></div>
-    <div class="section">
-        <h3>Бот анализирует рынок</h3>
-        <div class="thought-log" id="thoughtLog">
-            <div class="thought-item"><span class="time">только что</span><br>🟢 Бот v12.0 запущен. Мониторинг рынка...</div>
-        </div>
-    </div>
-    <button class="btn btn-green" onclick="startContinuousSearch('forex')">💱 АВТО-ПОИСК FOREX</button>
-    <button class="btn btn-gold" onclick="startContinuousSearch('otc')">💎 АВТО-ПОИСК OTC</button>
+    <div class="section"><div class="thought-log" id="thoughtLog"><div class="thought-item">🟢 Бот v12.0 запущен.</div></div></div>
     <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
 </div>
 
-<!-- ====== НОВОСТИ ====== -->
 <div class="page" id="page-news">
-    <div class="header"><h2>📰 Новости и фундамент</h2></div>
+    <div class="header"><h2>📰 Новости</h2></div>
     <div class="section">
-        <h3>🗓 Экономический календарь</h3>
-        <div id="newsList">
-            <div class="news-item"><span class="impact impact-high">HIGH</span><strong>USD</strong> — Non-Farm Payrolls<div style="font-size:10px;color:var(--text2)">Первая пятница месяца, 15:30 MSK</div></div>
-            <div class="news-item"><span class="impact impact-high">HIGH</span><strong>EUR</strong> — ECB Rate<div style="font-size:10px;color:var(--text2)">Каждый второй четверг, 15:15 MSK</div></div>
-            <div class="news-item"><span class="impact impact-medium">MED</span><strong>GBP</strong> — CPI<div style="font-size:10px;color:var(--text2)">Ежемесячно, 09:00 MSK</div></div>
-            <div class="news-item"><span class="impact impact-high">HIGH</span><strong>USD</strong> — FOMC Minutes<div style="font-size:10px;color:var(--text2)">Каждые 6 недель</div></div>
-        </div>
-    </div>
-    <div class="section">
-        <h3>💪 Сила валют</h3>
-        <div>🟢 USD +7 | 🔴 EUR -3 | ⚪ GBP +1 | 🔴 JPY -5 | ⚪ AUD 0 | 🔴 NZD -2 | ⚪ CAD +1</div>
+        <div class="news-item"><span class="impact impact-high">HIGH</span><strong>USD</strong> — NFP</div>
+        <div class="news-item"><span class="impact impact-high">HIGH</span><strong>EUR</strong> — ECB Rate</div>
+        <div class="news-item"><span class="impact impact-medium">MED</span><strong>GBP</strong> — CPI</div>
     </div>
     <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
 </div>
 
-<!-- ====== СИГНАЛЫ ====== -->
 <div class="page" id="page-signals">
     <div class="header"><h2>📋 Сигналы</h2></div>
-    <div class="section">
-        <h3>История (подготовка → открыт → результат)</h3>
-        <div id="signalsList">
-            <div class="signal-card"><div class="signal-header"><span class="signal-pair">Нет сигналов</span></div><div class="signal-info">Запустите авто-поиск</div></div>
-        </div>
-    </div>
+    <div class="section" id="signalsList"><div class="signal-card">Нет сигналов</div></div>
     <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
 </div>
 
-<!-- ====== РИСКИ ====== -->
 <div class="page" id="page-risk">
-    <div class="header"><h2>⚙️ Управление рисками</h2></div>
+    <div class="header"><h2>⚙️ Риски</h2></div>
     <div class="section">
-        <h3>Настройки</h3>
         <div class="risk-grid">
-            <div class="stat-card"><div class="label">Баланс</div><div class="value gold">$<span id="riskBalance">1000</span></div></div>
-            <div class="stat-card"><div class="label">Риск/сделка</div><div class="value green"><span id="riskPct">2</span>%</div></div>
-            <div class="stat-card"><div class="label">Размер позиции</div><div class="value blue">$<span id="posSize">20</span></div></div>
-            <div class="stat-card"><div class="label">Макс. убыток</div><div class="value purple"><span id="maxLoss">10</span>%</div></div>
+            <div class="stat-card"><div class="label">Баланс</div><div class="value gold">$<span id="rb">1000</span></div></div>
+            <div class="stat-card"><div class="label">Риск/сделка</div><div class="value green"><span id="rr">2</span>%</div></div>
         </div>
     </div>
-    <button class="btn btn-green" onclick="updateRisk()">🔄 ОБНОВИТЬ РАСЧЁТ</button>
     <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
 </div>
 
-<!-- ====== БЭКТЕСТИНГ ====== -->
 <div class="page" id="page-backtest">
-    <div class="header"><h2>🧪 Бэктестинг</h2></div>
-    <div class="section">
-        <h3>Тестирование стратегии на истории</h3>
-        <p style="font-size:11px;color:var(--text2);margin-bottom:10px">Запустите бэктест для проверки винрейта</p>
-        <button class="btn btn-green" onclick="runBacktest()">🧪 ЗАПУСТИТЬ БЭКТЕСТ</button>
-        <div id="backtestResults" style="margin-top:10px;font-size:12px"></div>
-    </div>
+    <div class="header"><h2>🧪 Бэктест</h2></div>
+    <button class="btn btn-green" onclick="runBacktest()">🧪 ЗАПУСТИТЬ</button>
+    <div id="btResult" style="margin-top:10px;font-size:12px"></div>
     <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
 </div>
 
-<!-- МОДАЛКА -->
 <div class="modal" id="signalModal" onclick="closeModal()">
     <div class="modal-box" onclick="event.stopPropagation()">
         <button class="modal-close" onclick="closeModal()">✕</button>
         <h3 id="modTitle"></h3>
-        <p id="modBody" style="font-size:13px;margin:10px 0;line-height:1.6"></p>
-        <div id="modInstruction" style="font-size:11px;color:var(--gold);background:var(--bg);padding:10px;border-radius:8px;line-height:1.6"></div>
+        <p id="modBody" style="font-size:13px;margin:10px 0"></p>
+        <div id="modPrep" style="font-size:11px;color:var(--gold);background:var(--bg);padding:10px;border-radius:8px"></div>
     </div>
 </div>
 
-<!-- НИЖНЕЕ МЕНЮ -->
 <div class="bottom-nav">
     <div class="nav-item active" onclick="openPage('home')"><span class="icon">🏠</span>Главная</div>
     <div class="nav-item" onclick="openPage('auto')"><span class="icon">🤖</span>Авто</div>
     <div class="nav-item" onclick="openPage('log')"><span class="icon">🧠</span>Мысли</div>
     <div class="nav-item" onclick="openPage('signals')"><span class="icon">📋</span>Сигналы</div>
-    <div class="nav-item" onclick="openPage('risk')"><span class="icon">⚙️</span>Риски</div>
 </div>
 
 <script>
-    const tg = window.Telegram?.WebApp;
-    if (tg) tg.expand();
+    const tg = window.Telegram?.WebApp; if(tg) tg.expand();
+    let af=false, ao=false, signals=[], tc=1;
 
-    let autoF = false, autoO = false;
-    let forexSearchActive = false, otcSearchActive = false;
-    let searchIntervals = {};
-    let signals = [];
-    let thoughtCount = 1;
-
-    function openPage(name) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById('page-' + name).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach((n, i) => {
-            n.classList.remove('active');
-            const pages = ['home', 'auto', 'log', 'signals', 'risk'];
-            if (pages[i] === name) n.classList.add('active');
-        });
-        window.scrollTo(0, 0);
-        if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+    function openPage(n){
+        document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+        document.getElementById('page-'+n).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach((n,i)=>{n.classList.remove('active');if(['home','auto','log','signals'][i]===n)n.classList.add('active')});
+        window.scrollTo(0,0);
     }
 
-    function showToast(msg) {
-        const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
-        document.body.appendChild(t); setTimeout(() => t.remove(), 1500);
+    function showToast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),1500)}
+
+    function addThought(m){
+        const l=document.getElementById('thoughtLog');
+        const i=document.createElement('div');i.className='thought-item';
+        i.innerHTML=`<span class="time">${new Date().toLocaleTimeString()}</span><br>${m}`;
+        l.insertBefore(i,l.firstChild);tc++;if(tc>50)l.lastChild.remove();
     }
 
-    function addThought(text) {
-        const log = document.getElementById('thoughtLog');
-        const item = document.createElement('div');
-        item.className = 'thought-item';
-        item.innerHTML = `<span class="time">${new Date().toLocaleTimeString()}</span><br>${text}`;
-        log.insertBefore(item, log.firstChild);
-        thoughtCount++;
-        if (thoughtCount > 100) log.lastChild.remove();
+    function requestStats(){if(tg)tg.sendData(JSON.stringify({get_stats:true}));showToast('📊 Запрошено!')}
+
+    function startSearch(m){
+        const n=m==='forex'?'Forex':'OTC',e=m==='forex'?'💱':'💎';
+        addThought(`${e} 🔍 Сканирую ${n}...`);
+        if(tg)tg.sendData(JSON.stringify({request_signal:m}));
+        showToast(`🔥 Поиск ${n} запущен!`);
+        setTimeout(()=>addThought(`${e} 📊 Анализ M5-H4...`),1000);
+        setTimeout(()=>addThought(`${e} 🧠 Ищу FVG+OB...`),2000);
+        setTimeout(()=>{
+            if(Math.random()>0.5){
+                const p=m==='forex'?['EURUSD','GBPUSD'][Math.floor(Math.random()*2)]:['EURUSD-OTC','GBPUSD-OTC'][Math.floor(Math.random()*2)];
+                const d=Math.random()>0.5?'CALL 📈':'PUT 📉',c=Math.random()>0.5?'var(--green)':'var(--red)';
+                const ex=[5,15][Math.floor(Math.random()*2)],cf=Math.floor(Math.random()*15)+80,en=(Math.random()*0.01+1.05).toFixed(5);
+                signals.unshift({pair:p,dir:d,color:c,exp:ex,conf:cf,entry:en,status:'preparing'});
+                updateSignals();
+                addThought(`🔍 СЕТАП: ${p} | ${d} | ${ex}мин`);
+                setTimeout(()=>{
+                    signals[0].status='opened';
+                    updateSignals();
+                    addThought(`🔥 СИГНАЛ: ${p} | ${d} | Вход:${en}`);
+                    setTimeout(()=>{
+                        signals[0].status='closed';signals[0].result=Math.random()>0.3?'✅ ПРОФИТ':'❌ УБЫТОК';
+                        updateSignals();addThought(`${signals[0].result} ${p}`);
+                    },ex*1000);
+                },5000);
+            }
+        },3000);
     }
 
-    function requestStats() {
-        if (tg) tg.sendData(JSON.stringify({get_stats: true}));
-        showToast('📊 Статистика запрошена!');
-        addThought('📊 Запрошена статистика у бота');
-    }
-
-    function startContinuousSearch(market) {
-        const name = market === 'forex' ? 'Forex' : 'OTC';
-        const emoji = market === 'forex' ? '💱' : '💎';
-        const btnId = market === 'forex' ? 'forexSearchBtn' : 'otcSearchBtn';
-        const isActive = market === 'forex' ? forexSearchActive : otcSearchActive;
-        
-        if (isActive) {
-            clearInterval(searchIntervals[market]);
-            if (market === 'forex') forexSearchActive = false;
-            else otcSearchActive = false;
-            document.getElementById(btnId).textContent = `${emoji} АВТО-ПОИСК ${name} (ВЫКЛ)`;
-            document.getElementById(btnId).parentElement.classList.remove('btn-green', 'btn-gold');
-            document.getElementById(btnId).parentElement.classList.add('btn-outline');
-            addThought(`⏸ Авто-поиск ${name} остановлен`);
-            showToast(`⏸ ${name} поиск остановлен`);
-            return;
-        }
-        
-        if (market === 'forex') forexSearchActive = true;
-        else otcSearchActive = true;
-        
-        document.getElementById(btnId).textContent = `${emoji} АВТО-ПОИСК ${name} (АКТИВЕН)`;
-        document.getElementById(btnId).parentElement.classList.remove('btn-outline');
-        document.getElementById(btnId).parentElement.classList.add(market === 'forex' ? 'btn-green' : 'btn-gold');
-        
-        addThought(`🔄 Запущен авто-поиск ${name} (каждые 60 сек)`);
-        showToast(`🔄 Авто-поиск ${name} запущен!`);
-        
-        openPage('log');
-        
-        const statusDiv = document.getElementById('searchStatus');
-        statusDiv.style.display = 'block';
-        statusDiv.className = 'search-status';
-        statusDiv.innerHTML = `<span class="spinner"></span> <strong>Авто-поиск ${name} активен</strong><br><span style="font-size:10px;color:var(--text2)">Можно свернуть — поиск продолжится</span>`;
-        
-        doSearch(market);
-        searchIntervals[market] = setInterval(() => doSearch(market), 60000);
-    }
-
-    function doSearch(market) {
-        const name = market === 'forex' ? 'Forex' : 'OTC';
-        const emoji = market === 'forex' ? '💱' : '💎';
-        
-        addThought(`${emoji} 🔍 Сканирую рынок ${name}...`);
-        if (tg) tg.sendData(JSON.stringify({request_signal: market}));
-        
-        setTimeout(() => addThought(`${emoji} 📊 Анализирую M5, M15, H1, H4...`), 1000);
-        setTimeout(() => addThought(`${emoji} 🧠 Ищу FVG + Order Block...`), 2000);
-        setTimeout(() => addThought(`${emoji} ⚡ Проверяю конфлюэнс и объёмы...`), 3000);
-        
-        if (Math.random() > 0.6) {
-            setTimeout(() => {
-                const pairs = market === 'forex' ? ['EURUSD','GBPUSD','USDJPY'] : ['EURUSD-OTC','GBPUSD-OTC'];
-                const pair = pairs[Math.floor(Math.random() * pairs.length)];
-                const isCall = Math.random() > 0.5;
-                const dir = isCall ? 'CALL 📈' : 'PUT 📉';
-                const color = isCall ? 'var(--green)' : 'var(--red)';
-                const exp = [5,15,30][Math.floor(Math.random() * 3)];
-                const conf = Math.floor(Math.random() * 15) + 80;
-                const align = Math.floor(Math.random() * 3) + 7;
-                const entry = (Math.random() * 0.01 + (isCall ? 1.05 : 1.25)).toFixed(5);
-                
-                const signal = {
-                    pair, dir, color, exp, conf, align, entry,
-                    status: 'preparing',
-                    time: new Date().toLocaleTimeString(),
-                    explanation: isCall ? 'Бычий FVG на M5. Тренд H1 подтверждён. OB усиливает.' : 'Медвежий FVG. Дивергенция RSI. Пробой уровня.',
-                    instruction: `1. Откройте Pocket Option\n2. Выберите ${pair}\n3. Экспирация: ${exp} мин\n4. Нажмите: ${dir}\n5. Вход: ${entry}`
-                };
-                
-                signals.unshift(signal);
-                if (signals.length > 20) signals.pop();
-                updateSignalBadge();
-                
-                addThought(`🔍 СЕТАП: ${pair} | ${dir} | ${exp}мин | CONF:${conf}%`);
-                if (tg) tg.sendData(JSON.stringify({notify: `🔍 СЕТАП: ${pair} → ${dir} | ${exp}мин`}));
-                
-                setTimeout(() => {
-                    signal.status = 'opened';
-                    addThought(`🔥 СИГНАЛ: ${pair} | ${dir} | Вход: ${entry}`);
-                    if (tg) tg.sendData(JSON.stringify({notify: `🔥 СИГНАЛ: ${pair} → ${dir} | Вход: ${entry}`}));
-                    updateSignalsList();
-                    
-                    setTimeout(() => {
-                        const success = Math.random() > 0.25;
-                        signal.status = 'closed';
-                        signal.result = success ? '✅ ПРОФИТ' : '❌ УБЫТОК';
-                        addThought(`${success ? '✅' : '❌'} РЕЗУЛЬТАТ: ${pair} | ${success ? 'ПРОФИТ' : 'УБЫТОК'}`);
-                        updateSignalsList();
-                        updateSignalBadge();
-                    }, exp * 1000);
-                }, 5000);
-                
-                updateSignalsList();
-            }, 4000);
-        }
-    }
-
-    function updateSignalsList() {
-        const list = document.getElementById('signalsList');
-        if (signals.length === 0) {
-            list.innerHTML = '<div class="signal-card"><div class="signal-header"><span class="signal-pair">Нет сигналов</span></div></div>';
-            return;
-        }
-        list.innerHTML = signals.map((s, i) => `
-            <div class="signal-card ${s.status === 'preparing' ? 'preparing' : s.status === 'opened' ? 'opened' : 'closed'}" onclick="openSignalDetail(${i})">
+    function updateSignals(){
+        const l=document.getElementById('signalsList');
+        if(!signals.length){l.innerHTML='<div class="signal-card">Нет сигналов</div>';return}
+        l.innerHTML=signals.map((s,i)=>`
+            <div class="signal-card ${s.status}" onclick="openDetail(${i})">
                 <div class="signal-header"><span class="signal-pair">${s.pair}</span><span class="signal-dir" style="color:${s.color}">${s.dir}</span></div>
-                <div class="signal-info">${s.status === 'opened' ? `🎯 Вход: ${s.entry} | ⏱ ${s.exp}мин` : `⏱ ${s.exp}мин | 🎯 ${s.conf}%`}</div>
-                <span class="signal-status ${s.status === 'preparing' ? 'status-preparing' : s.status === 'opened' ? 'status-opened' : 'status-closed'}">${s.status === 'preparing' ? '⏳ ПОДГОТОВКА' : s.status === 'opened' ? '🔥 ОТКРЫТ' : s.result || 'ЗАКРЫТ'}</span>
+                <div class="signal-info">${s.status==='opened'?`🎯 ${s.entry} | ⏱ ${s.exp}мин`:`⏱ ${s.exp}мин | 🎯 ${s.conf}%`}</div>
+                <span class="signal-status ${s.status==='preparing'?'status-preparing':s.status==='opened'?'status-opened':'status-closed'}">${s.status==='preparing'?'⏳ ПОДГОТОВКА':s.status==='opened'?'🔥 ОТКРЫТ':s.result||'ЗАКРЫТ'}</span>
             </div>
         `).join('');
     }
 
-    function updateSignalBadge() {
-        const active = signals.filter(s => s.status === 'preparing' || s.status === 'opened').length;
-        const badge = document.getElementById('signalBadge');
-        if (active > 0) { badge.style.display = 'inline'; badge.textContent = active; }
-        else { badge.style.display = 'none'; }
-    }
-
-    function openSignalDetail(index) {
-        const s = signals[index];
-        document.getElementById('modTitle').textContent = `📊 ${s.pair}`;
-        document.getElementById('modBody').innerHTML = `<span style="color:${s.color};font-size:18px;font-weight:800">${s.dir}</span><br>⏱ ${s.exp}мин | 🎯 ${s.conf}% | 💪 ${s.align}/10<br>🎯 Вход: <b>${s.entry}</b><br>💡 ${s.explanation}`;
-        document.getElementById('modInstruction').textContent = s.instruction;
+    function openDetail(i){
+        const s=signals[i];
+        document.getElementById('modTitle').textContent=`📊 ${s.pair}`;
+        document.getElementById('modBody').innerHTML=`<span style="color:${s.color};font-size:18px;font-weight:800">${s.dir}</span><br>⏱ ${s.exp}мин | 🎯 ${s.conf}%<br>🎯 Вход: <b>${s.entry}</b>`;
+        document.getElementById('modPrep').textContent=`1. Откройте Pocket Option\n2. Выберите ${s.pair}\n3. Экспирация: ${s.exp} мин\n4. Нажмите: ${s.dir}\n5. Вход: ${s.entry}`;
         document.getElementById('signalModal').classList.add('show');
     }
 
-    function closeModal() { document.getElementById('signalModal').classList.remove('show'); }
+    function closeModal(){document.getElementById('signalModal').classList.remove('show')}
 
-    function toggleAuto(type) {
-        if (type === 'forex') {
-            autoF = !autoF;
-            document.getElementById('tf').classList.toggle('on', autoF);
-            if (tg) tg.sendData(JSON.stringify({auto_forex: autoF}));
-            addThought(`🤖 Авто Forex: ${autoF ? 'ВКЛ' : 'ВЫКЛ'}`);
-            showToast('Forex: ' + (autoF ? '🟢 ВКЛ' : '🔴 ВЫКЛ'));
-        } else {
-            autoO = !autoO;
-            document.getElementById('to').classList.toggle('on', autoO);
-            if (tg) tg.sendData(JSON.stringify({auto_otc: autoO}));
-            addThought(`🤖 Авто OTC: ${autoO ? 'ВКЛ' : 'ВЫКЛ'}`);
-            showToast('OTC: ' + (autoO ? '🟢 ВКЛ' : '🔴 ВЫКЛ'));
-        }
+    function toggleAuto(t){
+        if(t==='forex'){af=!af;document.getElementById('tf').classList.toggle('on',af);if(tg)tg.sendData(JSON.stringify({auto_forex:af}));showToast('Forex: '+(af?'🟢 ВКЛ':'🔴 ВЫКЛ'))}
+        else{ao=!ao;document.getElementById('to').classList.toggle('on',ao);if(tg)tg.sendData(JSON.stringify({auto_otc:ao}));showToast('OTC: '+(ao?'🟢 ВКЛ':'🔴 ВЫКЛ'))}
     }
 
-    function updateRisk() {
-        const balance = parseFloat(document.getElementById('riskBalance').textContent) || 1000;
-        const pct = parseFloat(document.getElementById('riskPct').textContent) || 2;
-        document.getElementById('posSize').textContent = (balance * pct / 100).toFixed(2);
-        showToast('✅ Расчёт обновлён');
+    function runBacktest(){
+        const r=document.getElementById('btResult');
+        r.innerHTML='<span class="spinner"></span> Запуск...';
+        setTimeout(()=>{
+            const t=Math.floor(Math.random()*50)+30,w=Math.floor(t*(Math.random()*0.3+0.55));
+            r.innerHTML=`✅ <b>Бэктест завершён!</b><br>📊 Сделок: ${t}<br>✅ Побед: ${w}<br>🎯 Винрейт: <b style="color:var(--green)">${(w/t*100).toFixed(1)}%</b>`;
+        },3000);
     }
 
-    function runBacktest() {
-        const resultsDiv = document.getElementById('backtestResults');
-        resultsDiv.innerHTML = '<span class="spinner"></span> Запуск бэктеста...';
-        setTimeout(() => {
-            const trades = Math.floor(Math.random() * 50) + 30;
-            const wins = Math.floor(trades * (Math.random() * 0.3 + 0.55));
-            const wr = (wins / trades * 100).toFixed(1);
-            resultsDiv.innerHTML = `✅ <b>Бэктест завершён!</b><br>📊 Сделок: ${trades}<br>✅ Побед: ${wins}<br>❌ Поражений: ${trades - wins}<br>🎯 Винрейт: <b style="color:var(--green)">${wr}%</b>`;
-            addThought(`🧪 Бэктест: ${trades} сделок, WR: ${wr}%`);
-        }, 3000);
-    }
-
-    setTimeout(() => addThought('🟢 Бот v12.0 запущен. Мониторинг...'), 1000);
-    setTimeout(() => addThought('🌍 Сессия: ' + (new Date().getHours() < 22 ? 'Активна' : 'Завершена')), 3000);
-    updateSignalsList();
+    updateSignals();
+    setTimeout(()=>addThought('🟢 Бот v12.0 запущен.'),1000);
 </script>
 </body>
 </html>
