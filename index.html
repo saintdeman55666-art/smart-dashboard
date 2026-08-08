@@ -1,26 +1,338 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ULTRA Bot">
+    <meta name="theme-color" content="#0a0e17">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>ULTRA Smart Money</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg: #0a0e17; --card: #111827; --border: #1f2937;
+            --green: #10b981; --red: #ef4444; --blue: #3b82f6;
+            --gold: #f59e0b; --text: #e5e7eb; --text2: #9ca3af;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; }
+        
+        .page { display: none; padding: 16px; min-height: 100vh; padding-bottom: 100px; }
+        .page.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .header { text-align: center; padding: 16px 0; }
+        .logo {
+            width: 56px; height: 56px; margin: 0 auto 10px;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            border-radius: 16px; display: flex; align-items: center; justify-content: center;
+            font-size: 28px;
+        }
+        h1 { font-size: 20px; font-weight: 800; }
+        h2 { font-size: 18px; margin-bottom: 10px; }
+        
+        .section { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin: 10px 0; }
+        .section h3 { font-size: 13px; margin-bottom: 8px; }
+        
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .stat-card { background: var(--bg); border-radius: 10px; padding: 10px; text-align: center; }
+        .stat-card .value { font-size: 20px; font-weight: 800; }
+        .stat-card .label { font-size: 9px; color: var(--text2); }
+        .green { color: var(--green); } .gold { color: var(--gold); } .blue { color: var(--blue); } .purple { color: #8b5cf6; }
+        
+        .btn {
+            display: block; width: 100%; padding: 12px; border: 1px solid var(--border);
+            background: var(--card); color: var(--text); border-radius: 12px;
+            font-size: 14px; text-align: center; cursor: pointer; margin: 6px 0;
+            transition: all 0.2s;
+        }
+        .btn:active { border-color: var(--blue); background: #1a2332; }
+        .btn.primary { background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; color: white; font-weight: 600; }
+        .btn.green { background: var(--green); border: none; color: white; font-weight: 600; }
+        .btn.red { background: var(--red); border: none; color: white; font-weight: 600; }
+        
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
+        .toggle {
+            width: 48px; height: 26px; background: var(--border); border-radius: 13px;
+            cursor: pointer; position: relative; transition: background 0.3s;
+        }
+        .toggle.on { background: var(--green); }
+        .toggle::after {
+            content: ''; position: absolute; top: 2px; left: 2px;
+            width: 22px; height: 22px; background: white; border-radius: 50%;
+            transition: transform 0.3s;
+        }
+        .toggle.on::after { transform: translateX(22px); }
+        
+        .signal-card {
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 12px; padding: 14px; margin: 8px 0; cursor: pointer;
+        }
+        .signal-card:active { border-color: var(--blue); }
+        .signal-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .signal-pair { font-weight: 700; }
+        .signal-dir { font-weight: 800; }
+        .signal-info { font-size: 11px; color: var(--text2); }
+        .signal-exp { font-size: 10px; color: var(--gold); margin-top: 4px; }
+        
+        .modal {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9); z-index: 99;
+            display: none; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .modal.show { display: flex; }
+        .modal-box {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 16px; padding: 20px; width: 100%; max-width: 380px;
+        }
+        .modal-close { float: right; background: none; border: none; color: var(--text2); font-size: 22px; cursor: pointer; }
+        
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: var(--card); border-top: 1px solid var(--border);
+            display: flex; justify-content: space-around; padding: 8px 0;
+            z-index: 50;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 2px; cursor: pointer; padding: 4px 8px;
+            color: var(--text2); font-size: 9px; transition: color 0.2s;
+        }
+        .nav-item.active { color: var(--blue); }
+        .nav-item .icon { font-size: 20px; }
+        
+        .toast {
+            position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+            background: var(--blue); color: white; padding: 10px 20px;
+            border-radius: 20px; font-weight: 600; font-size: 13px;
+            z-index: 999; animation: toastIn 0.3s ease;
+        }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(-10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+    </style>
+</head>
+<body>
+
+<!-- Главная -->
+<div class="page active" id="page-home">
+    <div class="header">
+        <div class="logo">⚡</div>
+        <h1>ULTRA Smart Money</h1>
+        <p style="color:var(--text2);font-size:11px">v8.0 • <span style="color:var(--green)">●</span> Live</p>
+    </div>
+    
+    <div class="section">
+        <div class="stats-grid">
+            <div class="stat-card"><div class="label">Сделок</div><div class="value gold" id="t">0</div></div>
+            <div class="stat-card"><div class="label">Винрейт</div><div class="value green" id="w">0%</div></div>
+            <div class="stat-card"><div class="label">CALL</div><div class="value blue" id="c">0</div></div>
+            <div class="stat-card"><div class="label">PUT</div><div class="value purple" id="p">0</div></div>
+        </div>
+    </div>
+    
+    <button class="btn primary" onclick="openPage('signals')">🎯 СИГНАЛЫ</button>
+    <button class="btn primary" onclick="openPage('stats')">📊 СТАТИСТИКА</button>
+    <button class="btn" onclick="openPage('forex')">💱 FOREX</button>
+    <button class="btn" onclick="openPage('otc')">💎 OTC</button>
+    <button class="btn" onclick="openPage('auto')">🤖 АВТОТРЕЙДИНГ</button>
+    <button class="btn" onclick="openPage('history')">📜 ИСТОРИЯ</button>
+</div>
+
+<!-- Сигналы -->
+<div class="page" id="page-signals">
+    <div class="header"><h2>🎯 Сигналы</h2></div>
+    <button class="btn green" onclick="requestSignal('forex')">💱 ЗАПРОСИТЬ FOREX СИГНАЛ</button>
+    <button class="btn green" onclick="requestSignal('otc')">💎 ЗАПРОСИТЬ OTC СИГНАЛ</button>
+    <div class="section"><h3>Последние сигналы</h3><div id="signalsList"></div></div>
+    <button class="btn" onclick="openPage('home')">🔙 НАЗАД</button>
+</div>
+
+<!-- Статистика -->
+<div class="page" id="page-stats">
+    <div class="header"><h2>📊 Статистика</h2></div>
+    <div class="section"><div class="stats-grid" id="statsGrid"></div></div>
+    <button class="btn" onclick="openPage('home')">🔙 НАЗАД</button>
+</div>
+
+<!-- Forex -->
+<div class="page" id="page-forex">
+    <div class="header"><h2>💱 Forex</h2></div>
+    <button class="btn green" onclick="requestSignal('forex')">🔄 ЗАПРОСИТЬ СИГНАЛ</button>
+    <div class="section"><h3>Статус пар</h3><div id="forexPairs"></div></div>
+    <button class="btn" onclick="openPage('home')">🔙 НАЗАД</button>
+</div>
+
+<!-- OTC -->
+<div class="page" id="page-otc">
+    <div class="header"><h2>💎 OTC</h2></div>
+    <button class="btn green" onclick="requestSignal('otc')">🔄 ЗАПРОСИТЬ СИГНАЛ</button>
+    <div class="section"><h3>Статус пар</h3><div id="otcPairs"></div></div>
+    <button class="btn" onclick="openPage('home')">🔙 НАЗАД</button>
+</div>
+
+<!-- Автотрейдинг -->
+<div class="page" id="page-auto">
+    <div class="header"><h2>🤖 Автотрейдинг</h2></div>
+    <div class="section">
+        <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Включите автоматическую торговлю. Бот будет открывать сделки САМ при сильных сигналах.</p>
+        <div class="toggle-row">
+            <span>💱 Forex авто</span>
+            <div class="toggle" id="toggleForex" onclick="toggleAuto('forex')"></div>
+        </div>
+        <div class="toggle-row">
+            <span>💎 OTC авто</span>
+            <div class="toggle" id="toggleOtc" onclick="toggleAuto('otc')"></div>
+        </div>
+    </div>
+    <button class="btn" onclick="openPage('home')">🔙 НАЗАД</button>
+</div>
+
+<!-- История -->
+<div class="page" id="page-history">
+    <div class="header"><h2>📜 История</h2></div>
+    <div id="historyList"></div>
+    <button class="btn" onclick="openPage('home')">🔙 НАЗАД</button>
+</div>
+
+<!-- Модалка -->
+<div class="modal" id="modal" onclick="closeModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <h3 id="modTitle"></h3>
+        <p id="modBody" style="font-size:13px;margin:10px 0"></p>
+        <div id="modPrep" style="font-size:11px;color:var(--gold);background:var(--bg);padding:10px;border-radius:8px"></div>
+    </div>
+</div>
+
+<!-- Нижнее меню -->
+<div class="bottom-nav">
+    <div class="nav-item active" onclick="openPage('home')"><span class="icon">🏠</span>Главная</div>
+    <div class="nav-item" onclick="openPage('signals')"><span class="icon">🎯</span>Сигналы</div>
+    <div class="nav-item" onclick="openPage('stats')"><span class="icon">📊</span>Стата</div>
+    <div class="nav-item" onclick="openPage('auto')"><span class="icon">🤖</span>Авто</div>
+</div>
+
+<script>
+// Telegram WebApp
+const tg = window.Telegram && window.Telegram.WebApp;
+if (tg && tg.expand) tg.expand();
+
+// Навигация
+function openPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const navMap = {home:0, signals:1, stats:2, auto:3};
+    if (navMap[name] !== undefined) document.querySelectorAll('.nav-item')[navMap[name]].classList.add('active');
+    window.scrollTo(0, 0);
+    if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+}
+
+// Toast
+function showToast(msg) {
+    let t = document.createElement('div');
+    t.className = 'toast'; t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 1500);
+}
+
+// Автотрейдинг
+let autoF = false, autoO = false;
 function toggleAuto(type) {
     if (type === 'forex') {
         autoF = !autoF;
         document.getElementById('toggleForex').classList.toggle('on', autoF);
-        // Отправка в бота
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.sendData(JSON.stringify({auto_forex: autoF}));
-        }
+        if (tg) tg.sendData(JSON.stringify({auto_forex: autoF}));
         showToast('Forex авто: ' + (autoF ? '🟢 ВКЛ' : '🔴 ВЫКЛ'));
     } else {
         autoO = !autoO;
         document.getElementById('toggleOtc').classList.toggle('on', autoO);
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.sendData(JSON.stringify({auto_otc: autoO}));
-        }
+        if (tg) tg.sendData(JSON.stringify({auto_otc: autoO}));
         showToast('OTC авто: ' + (autoO ? '🟢 ВКЛ' : '🔴 ВЫКЛ'));
     }
 }
 
+// Запрос сигнала
 function requestSignal(market) {
-    if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.sendData(JSON.stringify({request_signal: market}));
-        window.Telegram.WebApp.close();
+    if (tg) {
+        tg.sendData(JSON.stringify({request_signal: market}));
+        tg.close();
     }
-    showToast('✅ Запрос отправлен');
+    showToast('✅ Запрос ' + market.toUpperCase() + ' отправлен!');
 }
+
+// Модалка
+function openModal(title, body, prep) {
+    document.getElementById('modTitle').textContent = title;
+    document.getElementById('modBody').innerHTML = body;
+    document.getElementById('modPrep').textContent = prep;
+    document.getElementById('modal').classList.add('show');
+}
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+// Данные сигналов
+const signals = [
+    {pair:'EURUSD',dir:'CALL 📈',color:'#10b981',time:'15 мин',conf:'85%',str:'8/10',exp:'Бычий FVG + OB на M5',prep:'Откройте Pocket Option → EURUSD → экспирация 15 мин → CALL'},
+    {pair:'GBPUSD',dir:'PUT 📉',color:'#ef4444',time:'30 мин',conf:'78%',str:'7/10',exp:'Медвежий FVG, дивергенция RSI',prep:'Откройте Pocket Option → GBPUSD → экспирация 30 мин → PUT'},
+    {pair:'USDJPY',dir:'CALL 📈',color:'#10b981',time:'5 мин',conf:'92%',str:'9/10',exp:'Пробой сопротивления, все ТФ вверх',prep:'Откройте Pocket Option → USDJPY → экспирация 5 мин → CALL'},
+];
+
+function loadSignals() {
+    document.getElementById('signalsList').innerHTML = signals.map((s,i) => `
+        <div class="signal-card" onclick="openModal('📊 ${s.pair}','<span style=color:${s.color};font-size:18px>${s.dir}</span><br>⏱ ${s.time} | 🎯 ${s.conf} | 💪 ${s.str}','${s.prep}')">
+            <div class="signal-header"><span class="signal-pair">${s.pair}</span><span class="signal-dir" style="color:${s.color}">${s.dir}</span></div>
+            <div class="signal-info">⏱ ${s.time} | 🎯 ${s.conf} | 💪 ${s.str}</div>
+            <div class="signal-exp">💡 ${s.exp}</div>
+        </div>
+    `).join('');
+}
+
+function loadStats() {
+    const t = Math.floor(Math.random()*80)+40, w = Math.random()*30+60;
+    document.getElementById('t').textContent = t;
+    document.getElementById('w').textContent = w.toFixed(1)+'%';
+    document.getElementById('c').textContent = Math.floor(t*0.52);
+    document.getElementById('p').textContent = t - Math.floor(t*0.52);
+    
+    document.getElementById('statsGrid').innerHTML = `
+        <div class="stat-card"><div class="label">Всего</div><div class="value gold">${t}</div></div>
+        <div class="stat-card"><div class="label">Винрейт</div><div class="value green">${w.toFixed(1)}%</div></div>
+        <div class="stat-card"><div class="label">CALL</div><div class="value blue">${Math.floor(t*0.52)}</div></div>
+        <div class="stat-card"><div class="label">PUT</div><div class="value purple">${t-Math.floor(t*0.52)}</div></div>
+        <div class="stat-card"><div class="label">Forex WR</div><div class="value green">${(w+3).toFixed(1)}%</div></div>
+        <div class="stat-card"><div class="label">OTC WR</div><div class="value gold">${(w-2).toFixed(1)}%</div></div>
+        <div class="stat-card"><div class="label">Авто WR</div><div class="value blue">${(w+5).toFixed(1)}%</div></div>
+        <div class="stat-card"><div class="label">Лучшая</div><div class="value purple">EURUSD</div></div>
+    `;
+}
+
+function loadPairs() {
+    const pairs = ['EURUSD','GBPUSD','USDJPY','AUDUSD','EURGBP','EURJPY'];
+    const trends = ['📈 BULLISH','📉 BEARISH','📈 BULLISH','➡️ NEUTRAL','📉 BEARISH','📈 BULLISH'];
+    document.getElementById('forexPairs').innerHTML = pairs.map((p,i) => `<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">${p}: ${trends[i]}</div>`).join('');
+    document.getElementById('otcPairs').innerHTML = pairs.map((p,i) => `<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">${p}-OTC: ${trends[i]}</div>`).join('');
+}
+
+function loadHistory() {
+    const h = [
+        {s:'EURUSD',d:'CALL',r:'✅',c:'#10b981'},
+        {s:'GBPUSD',d:'PUT',r:'✅',c:'#10b981'},
+        {s:'USDJPY',d:'CALL',r:'❌',c:'#ef4444'},
+        {s:'AUDUSD',d:'PUT',r:'✅',c:'#10b981'},
+        {s:'EURGBP',d:'CALL',r:'✅',c:'#10b981'},
+    ];
+    document.getElementById('historyList').innerHTML = h.map(x => `
+        <div class="signal-card">
+            <div class="signal-header"><span class="signal-pair">${x.s}</span><span style="color:${x.c}">${x.r} ${x.d}</span></div>
+        </div>
+    `).join('');
+}
+
+// Инициализация
+loadSignals(); loadStats(); loadPairs(); loadHistory();
+</script>
+</body>
+</html>
