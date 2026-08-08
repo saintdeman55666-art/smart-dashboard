@@ -132,6 +132,11 @@
         @keyframes modalIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
         .modal-close { float: right; background: none; border: none; color: var(--text2); font-size: 22px; cursor: pointer; }
         .risk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        input {
+            width: 100%; padding: 12px; background: var(--bg);
+            border: 1px solid var(--border); border-radius: 12px;
+            color: var(--text); font-size: 16px; margin: 8px 0;
+        }
     </style>
 </head>
 <body>
@@ -198,18 +203,49 @@
 
 <div class="page" id="page-signals">
     <div class="header"><h2>📋 Сигналы</h2></div>
-    <div class="section" id="signalsList"><div class="signal-card">Нет сигналов</div></div>
+    
+    <div class="section">
+        <h3>⏳ ГОТОВЯТСЯ</h3>
+        <div id="preparingList"><div class="signal-card">Нет готовящихся сигналов</div></div>
+    </div>
+    
+    <div class="section">
+        <h3>🔥 В РАБОТЕ</h3>
+        <div id="openedList"><div class="signal-card">Нет активных сигналов</div></div>
+    </div>
+    
+    <div class="section">
+        <h3>✅ ЗАВЕРШЁННЫЕ</h3>
+        <div id="closedList"><div class="signal-card">Нет завершённых сигналов</div></div>
+    </div>
+    
     <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
 </div>
 
 <div class="page" id="page-risk">
-    <div class="header"><h2>⚙️ Риски</h2></div>
+    <div class="header"><h2>⚙️ Управление рисками</h2></div>
+    
     <div class="section">
+        <h3>💰 Баланс</h3>
+        <input type="number" id="riskBalanceInput" value="1000">
+        <button class="btn btn-green" onclick="updateBalance()">💾 СОХРАНИТЬ БАЛАНС</button>
+    </div>
+    
+    <div class="section">
+        <h3>📊 Риск на сделку (%)</h3>
+        <input type="number" id="riskPctInput" value="2" step="0.5" min="0.5" max="10">
+        <button class="btn btn-green" onclick="updateRisk()">💾 СОХРАНИТЬ РИСК</button>
+    </div>
+    
+    <div class="section">
+        <h3>📋 Текущие настройки</h3>
         <div class="risk-grid">
-            <div class="stat-card"><div class="label">Баланс</div><div class="value gold">$<span id="rb">1000</span></div></div>
-            <div class="stat-card"><div class="label">Риск/сделка</div><div class="value green"><span id="rr">2</span>%</div></div>
+            <div class="stat-card"><div class="label">Баланс</div><div class="value gold" id="rb">$1000</div></div>
+            <div class="stat-card"><div class="label">Риск</div><div class="value green"><span id="rr">2</span>%</div></div>
+            <div class="stat-card"><div class="label">Позиция</div><div class="value blue" id="rpos">$20</div></div>
         </div>
     </div>
+    
     <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
 </div>
 
@@ -280,22 +316,31 @@
                     setTimeout(()=>{
                         signals[0].status='closed';signals[0].result=Math.random()>0.3?'✅ ПРОФИТ':'❌ УБЫТОК';
                         updateSignals();addThought(`${signals[0].result} ${p}`);
-                    },ex*1000);
+                    },ex*60000);  // ИСПРАВЛЕНО: было exp*1000, теперь минуты
                 },5000);
             }
         },3000);
     }
 
-    function updateSignals(){
-        const l=document.getElementById('signalsList');
-        if(!signals.length){l.innerHTML='<div class="signal-card">Нет сигналов</div>';return}
-        l.innerHTML=signals.map((s,i)=>`
-            <div class="signal-card ${s.status}" onclick="openDetail(${i})">
+    function signalCard(s, i){
+        const realIndex = signals.indexOf(s);
+        return `
+            <div class="signal-card ${s.status}" onclick="openDetail(${realIndex})">
                 <div class="signal-header"><span class="signal-pair">${s.pair}</span><span class="signal-dir" style="color:${s.color}">${s.dir}</span></div>
-                <div class="signal-info">${s.status==='opened'?`🎯 ${s.entry} | ⏱ ${s.exp}мин`:`⏱ ${s.exp}мин | 🎯 ${s.conf}%`}</div>
-                <span class="signal-status ${s.status==='preparing'?'status-preparing':s.status==='opened'?'status-opened':'status-closed'}">${s.status==='preparing'?'⏳ ПОДГОТОВКА':s.status==='opened'?'🔥 ОТКРЫТ':s.result||'ЗАКРЫТ'}</span>
+                <div class="signal-info">${s.status==='opened' ? `🎯 ${s.entry} | ⏱ ${s.exp}мин` : `⏱ ${s.exp}мин | 🎯 ${s.conf}%`}</div>
+                <span class="signal-status ${s.status==='preparing'?'status-preparing':s.status==='opened'?'status-opened':'status-closed'}">${s.status==='preparing'?'⏳ ПОДГОТОВКА':s.status==='opened'?'🔥 В РАБОТЕ':s.result||'ЗАКРЫТ'}</span>
             </div>
-        `).join('');
+        `;
+    }
+
+    function updateSignals(){
+        const preparing = signals.filter(s => s.status === 'preparing');
+        const opened = signals.filter(s => s.status === 'opened');
+        const closed = signals.filter(s => s.status === 'closed');
+        
+        document.getElementById('preparingList').innerHTML = preparing.length ? preparing.map((s,i) => signalCard(s,i)).join('') : '<div class="signal-card">Нет готовящихся сигналов</div>';
+        document.getElementById('openedList').innerHTML = opened.length ? opened.map((s,i) => signalCard(s,i)).join('') : '<div class="signal-card">Нет активных сигналов</div>';
+        document.getElementById('closedList').innerHTML = closed.length ? closed.map((s,i) => signalCard(s,i)).join('') : '<div class="signal-card">Нет завершённых сигналов</div>';
     }
 
     function openDetail(i){
@@ -311,6 +356,31 @@
     function toggleAuto(t){
         if(t==='forex'){af=!af;document.getElementById('tf').classList.toggle('on',af);if(tg)tg.sendData(JSON.stringify({auto_forex:af}));showToast('Forex: '+(af?'🟢 ВКЛ':'🔴 ВЫКЛ'))}
         else{ao=!ao;document.getElementById('to').classList.toggle('on',ao);if(tg)tg.sendData(JSON.stringify({auto_otc:ao}));showToast('OTC: '+(ao?'🟢 ВКЛ':'🔴 ВЫКЛ'))}
+    }
+
+    function updateBalance(){
+        const val = document.getElementById('riskBalanceInput').value;
+        document.getElementById('rb').textContent = '$' + val;
+        document.getElementById('bal').textContent = val;
+        updatePositionSize();
+        showToast('✅ Баланс обновлён!');
+        if(tg) tg.sendData(JSON.stringify({set_balance: parseFloat(val)}));
+    }
+
+    function updateRisk(){
+        const val = document.getElementById('riskPctInput').value;
+        document.getElementById('rr').textContent = val + '%';
+        updatePositionSize();
+        showToast('✅ Риск обновлён!');
+        if(tg) tg.sendData(JSON.stringify({set_risk: parseFloat(val)}));
+    }
+
+    function updatePositionSize(){
+        const bal = parseFloat(document.getElementById('rb').textContent.replace('$','')) || 1000;
+        const pct = parseFloat(document.getElementById('rr').textContent.replace('%','')) || 2;
+        const pos = (bal * pct / 100).toFixed(2);
+        document.getElementById('rpos').textContent = '$' + pos;
+        document.getElementById('pos').textContent = pos;
     }
 
     function runBacktest(){
