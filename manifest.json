@@ -1,0 +1,20 @@
+{
+    "name": "ULTRA Smart Money Bot",
+    "short_name": "ULTRA Bot",
+    "start_url": "/smart-dashboard/",
+    "display": "standalone",
+    "background_color": "#0a0e17",
+    "theme_color": "#10b981",
+    "icons": [
+        {
+            "src": "https://via.placeholder.com/192x192/10b981/white?text=U",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "https://via.placeholder.com/512x512/10b981/white?text=U",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
