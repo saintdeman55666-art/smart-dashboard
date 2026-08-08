@@ -25,13 +25,9 @@
             min-height: 100vh; padding-bottom: calc(80px + var(--safe-bottom));
             -webkit-tap-highlight-color: transparent;
         }
-
-        /* Страницы */
         .page { display: none; padding: 16px; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Шапка */
         .header { text-align: center; padding: 20px 0 12px; }
         .logo {
             width: 56px; height: 56px; margin: 0 auto 8px;
@@ -40,18 +36,15 @@
             font-size: 28px; box-shadow: 0 4px 20px rgba(16,185,129,0.3);
         }
         h1 { font-size: 20px; font-weight: 800; }
+        h2 { font-size: 18px; text-align: center; padding: 10px 0; }
         .live { color: var(--green); font-size: 11px; }
         .live-dot { display: inline-block; width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; margin-right: 4px; }
         @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.4)} 50%{box-shadow:0 0 0 10px rgba(16,185,129,0)} }
-
-        /* Карточки */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
         .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px; text-align: center; }
         .stat-card .value { font-size: 22px; font-weight: 800; }
         .stat-card .label { font-size: 9px; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; }
         .green { color: var(--green); } .gold { color: var(--gold); } .blue { color: var(--blue); } .purple { color: var(--purple); }
-
-        /* Кнопки */
         .btn {
             display: block; width: 100%; padding: 14px; border: none; border-radius: 14px;
             color: white; font-size: 14px; font-weight: 700; cursor: pointer; margin: 6px 0;
@@ -62,36 +55,30 @@
         @keyframes gradient { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
         .btn-green { background: var(--green); }
         .btn-gold { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
-        .btn-red { background: var(--red); }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
-
-        /* Секции */
         .section { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin: 10px 0; }
         .section h3 { font-size: 12px; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-
-        /* Переключатели */
         .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg); border-radius: 12px; margin: 6px 0; }
         .toggle { width: 48px; height: 26px; background: var(--border); border-radius: 13px; cursor: pointer; transition: background 0.3s; position: relative; }
         .toggle.on { background: var(--green); }
         .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; background: white; border-radius: 50%; transition: transform 0.3s; }
         .toggle.on::after { transform: translateX(22px); }
-
-        /* Лог мыслей */
-        .thought-log { max-height: 300px; overflow-y: auto; font-size: 11px; line-height: 1.6; }
+        .thought-log { max-height: 350px; overflow-y: auto; font-size: 11px; line-height: 1.6; }
         .thought-log::-webkit-scrollbar { width: 4px; }
         .thought-log::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-        .thought-item { padding: 6px 0; border-bottom: 1px solid var(--border); animation: fadeIn 0.5s ease; }
+        .thought-item { padding: 8px 0; border-bottom: 1px solid var(--border); animation: fadeIn 0.5s ease; }
         .thought-item .time { color: var(--text2); font-size: 9px; }
         .thought-item .emoji { margin-right: 4px; }
-
-        /* Сигналы */
         .signal-card { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin: 8px 0; }
         .signal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
         .signal-pair { font-weight: 700; font-size: 14px; }
         .signal-dir { font-weight: 800; font-size: 14px; }
         .signal-info { font-size: 10px; color: var(--text2); }
-
-        /* Нижнее меню */
+        .news-item { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+        .news-item .impact { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 9px; font-weight: 700; margin-right: 6px; }
+        .impact-high { background: var(--red); color: white; }
+        .impact-medium { background: var(--gold); color: black; }
+        .impact-low { background: var(--green); color: white; }
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
             background: var(--card); border-top: 1px solid var(--border);
@@ -105,12 +92,8 @@
         }
         .nav-item.active { color: var(--blue); }
         .nav-item .icon { font-size: 20px; }
-
-        /* Прогресс-бар */
         .progress-bar { height: 18px; background: var(--border); border-radius: 9px; overflow: hidden; }
         .progress-fill { height: 100%; border-radius: 9px; transition: width 0.8s ease; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: white; }
-
-        /* Toast */
         .toast {
             position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
             background: var(--blue); color: white; padding: 10px 20px;
@@ -118,14 +101,17 @@
             z-index: 999; animation: toastIn 0.3s ease;
         }
         @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(-10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
-
-        /* Спиннер */
         .spinner {
             display: inline-block; width: 16px; height: 16px;
             border: 2px solid var(--border); border-top-color: var(--blue);
-            border-radius: 50%; animation: spin 0.8s linear infinite;
+            border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 6px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .search-status {
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 12px; padding: 12px; margin: 8px 0;
+            text-align: center; font-size: 13px;
+        }
     </style>
 </head>
 <body>
@@ -151,15 +137,17 @@
     <button class="btn btn-green" onclick="startSearch('forex')">💱 ПОИСК FOREX СИГНАЛОВ</button>
     <button class="btn btn-gold" onclick="startSearch('otc')">💎 ПОИСК OTC СИГНАЛОВ</button>
     <button class="btn btn-outline" onclick="openPage('auto')">🤖 АВТО-ТРЕЙДИНГ</button>
-    <button class="btn btn-outline" onclick="openPage('log')">🧠 ХОД РАЗМЫШЛЕНИЙ БОТА</button>
-    <button class="btn btn-outline" onclick="openPage('signals')">📋 ПОСЛЕДНИЕ СИГНАЛЫ</button>
+    <button class="btn btn-outline" onclick="openPage('log')">🧠 ХОД РАЗМЫШЛЕНИЙ</button>
+    <button class="btn btn-outline" onclick="openPage('news')">📰 НОВОСТИ И ФУНДАМЕНТ</button>
+    <button class="btn btn-outline" onclick="openPage('signals')">📋 СИГНАЛЫ</button>
 </div>
 
 <!-- ====== АВТО-ТРЕЙДИНГ ====== -->
 <div class="page" id="page-auto">
     <div class="header"><h2>🤖 Авто-трейдинг</h2></div>
     <div class="section">
-        <h3>Управление</h3>
+        <h3>Управление автоматической торговлей</h3>
+        <p style="font-size:11px;color:var(--text2);margin-bottom:10px">Бот будет сам открывать сделки при сильных сигналах (CONF≥85, ALIGN≥8)</p>
         <div class="toggle-row">
             <span>💱 Forex Auto</span>
             <div class="toggle" id="tf" onclick="toggleAuto('forex')"></div>
@@ -175,8 +163,9 @@
 <!-- ====== ХОД РАЗМЫШЛЕНИЙ ====== -->
 <div class="page" id="page-log">
     <div class="header"><h2>🧠 Ход размышлений</h2></div>
+    <div id="searchStatus" style="display:none"></div>
     <div class="section">
-        <h3>Бот анализирует рынок...</h3>
+        <h3>Бот анализирует рынок в реальном времени</h3>
         <div class="thought-log" id="thoughtLog">
             <div class="thought-item">
                 <span class="time">только что</span><br>
@@ -186,6 +175,54 @@
     </div>
     <button class="btn btn-green" onclick="startSearch('forex')">💱 ЗАПУСТИТЬ ПОИСК FOREX</button>
     <button class="btn btn-gold" onclick="startSearch('otc')">💎 ЗАПУСТИТЬ ПОИСК OTC</button>
+    <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
+</div>
+
+<!-- ====== НОВОСТИ ====== -->
+<div class="page" id="page-news">
+    <div class="header"><h2>📰 Новости и фундамент</h2></div>
+    <div class="section">
+        <h3>🗓 Экономический календарь</h3>
+        <div id="newsList">
+            <div class="news-item">
+                <span class="impact impact-high">HIGH</span>
+                <strong>USD</strong> — Non-Farm Payrolls (NFP)
+                <div style="font-size:10px;color:var(--text2)">Первая пятница месяца, 15:30 MSK</div>
+            </div>
+            <div class="news-item">
+                <span class="impact impact-high">HIGH</span>
+                <strong>EUR</strong> — ECB Interest Rate Decision
+                <div style="font-size:10px;color:var(--text2)">Каждый второй четверг, 15:15 MSK</div>
+            </div>
+            <div class="news-item">
+                <span class="impact impact-medium">MED</span>
+                <strong>GBP</strong> — CPI (Инфляция)
+                <div style="font-size:10px;color:var(--text2)">Ежемесячно, 09:00 MSK</div>
+            </div>
+            <div class="news-item">
+                <span class="impact impact-high">HIGH</span>
+                <strong>USD</strong> — FOMC Meeting Minutes
+                <div style="font-size:10px;color:var(--text2)">Каждые 6 недель</div>
+            </div>
+            <div class="news-item">
+                <span class="impact impact-medium">MED</span>
+                <strong>JPY</strong> — BOJ Policy Rate
+                <div style="font-size:10px;color:var(--text2)">Ежемесячно</div>
+            </div>
+        </div>
+    </div>
+    <div class="section">
+        <h3>💪 Сила валют (фундаментальный анализ)</h3>
+        <div id="currencyStrength">
+            <div class="news-item">🟢 <strong>USD</strong> — BULLISH (+7)</div>
+            <div class="news-item">🔴 <strong>EUR</strong> — BEARISH (-3)</div>
+            <div class="news-item">⚪ <strong>GBP</strong> — NEUTRAL (+1)</div>
+            <div class="news-item">🔴 <strong>JPY</strong> — BEARISH (-5)</div>
+            <div class="news-item">⚪ <strong>AUD</strong> — NEUTRAL (0)</div>
+            <div class="news-item">🔴 <strong>NZD</strong> — BEARISH (-2)</div>
+            <div class="news-item">⚪ <strong>CAD</strong> — NEUTRAL (+1)</div>
+        </div>
+    </div>
     <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
 </div>
 
@@ -206,6 +243,7 @@
     <div class="nav-item active" onclick="openPage('home')"><span class="icon">🏠</span>Главная</div>
     <div class="nav-item" onclick="openPage('auto')"><span class="icon">🤖</span>Авто</div>
     <div class="nav-item" onclick="openPage('log')"><span class="icon">🧠</span>Мысли</div>
+    <div class="nav-item" onclick="openPage('news')"><span class="icon">📰</span>Новости</div>
     <div class="nav-item" onclick="openPage('signals')"><span class="icon">📋</span>Сигналы</div>
 </div>
 
@@ -215,6 +253,7 @@
 
     let autoF = false, autoO = false;
     let thoughtCount = 1;
+    let isSearching = false;
 
     // Навигация
     function openPage(name) {
@@ -222,7 +261,7 @@
         document.getElementById('page-' + name).classList.add('active');
         document.querySelectorAll('.nav-item').forEach((n, i) => {
             n.classList.remove('active');
-            const pages = ['home', 'auto', 'log', 'signals'];
+            const pages = ['home', 'auto', 'log', 'news', 'signals'];
             if (pages[i] === name) n.classList.add('active');
         });
         window.scrollTo(0, 0);
@@ -235,39 +274,62 @@
         document.body.appendChild(t); setTimeout(() => t.remove(), 1500);
     }
 
-    // Запрос статистики
+    // Запрос статистики (НЕ ЗАКРЫВАЕТ приложение)
     function requestStats() {
-        if (tg) { tg.sendData(JSON.stringify({get_stats: true})); tg.close(); }
-        showToast('📊 Статистика запрошена!');
+        if (tg) {
+            tg.sendData(JSON.stringify({get_stats: true}));
+            // НЕ ЗАКРЫВАЕМ — остаёмся в приложении
+        }
+        showToast('📊 Запрос отправлен боту!');
+        addThought('📊', 'Запрошена статистика у бота...');
     }
 
-    // Поиск сигналов с мыслями
+    // Поиск сигналов (НЕ ЗАКРЫВАЕТ приложение)
     function startSearch(market) {
+        if (isSearching) { showToast('⏳ Поиск уже запущен...'); return; }
+        isSearching = true;
+        
         const name = market === 'forex' ? 'Forex' : 'OTC';
         const emoji = market === 'forex' ? '💱' : '💎';
         
         // Открываем лог мыслей
         openPage('log');
         
-        // Добавляем мысли
-        addThought(emoji, `Запускаю поиск сигналов ${name}...`);
+        // Показываем статус поиска
+        const statusDiv = document.getElementById('searchStatus');
+        statusDiv.style.display = 'block';
+        statusDiv.className = 'search-status';
+        statusDiv.innerHTML = `<span class="spinner"></span> <strong>Идёт поиск сигналов ${name}...</strong><br><span style="font-size:10px;color:var(--text2)">Не закрывайте приложение</span>`;
         
-        setTimeout(() => addThought('🔍', `Загружаю данные M5 для всех пар ${name}...`), 800);
-        setTimeout(() => addThought('📊', `Анализирую тренды на H1, H4...`), 1600);
-        setTimeout(() => addThought('🧠', `Ищу FVG паттерны и Order Blocks...`), 2400);
-        setTimeout(() => addThought('⚡', `Проверяю конфлюэнс и объёмы...`), 3200);
+        // Отправляем запрос боту (НЕ ЗАКРЫВАЕМ)
+        if (tg) {
+            tg.sendData(JSON.stringify({request_signal: market}));
+        }
+        
+        // Симуляция мыслей
+        const thoughts = [
+            {d:800, e:'🔍', t:`Загружаю данные M5 для всех пар ${name}...`},
+            {d:1600, e:'📊', t:'Анализирую тренды на H1, H4...'},
+            {d:2400, e:'🧠', t:'Ищу FVG паттерны и Order Blocks...'},
+            {d:3200, e:'⚡', t:'Проверяю конфлюэнс и объёмы...'},
+            {d:4000, e:'📡', t:'Отправляю запрос боту...'},
+            {d:5000, e:'✅', t:`Поиск ${name} завершён! Сигналы придут в чат.`},
+        ];
+        
+        thoughts.forEach(({d, e, t}) => {
+            setTimeout(() => addThought(e, t), d);
+        });
+        
         setTimeout(() => {
-            addThought('✅', `Анализ ${name} завершён! Отправляю запрос боту...`);
-            // Отправляем запрос боту
-            if (tg) { tg.sendData(JSON.stringify({request_signal: market})); tg.close(); }
-            showToast(`🔥 Сигнал ${name} запрошен!`);
-        }, 4000);
-
-        // Отправляем запрос сразу (бот пришлёт сигналы в чат)
-        if (tg) tg.sendData(JSON.stringify({request_signal: market}));
+            statusDiv.innerHTML = `<strong>✅ Поиск ${name} завершён!</strong><br><span style="font-size:10px;color:var(--text2)">Проверьте чат с ботом</span>`;
+            setTimeout(() => { statusDiv.style.display = 'none'; }, 3000);
+            isSearching = false;
+        }, 5500);
+        
+        showToast(`🔥 Поиск ${name} запущен!`);
     }
 
-    // Добавление мысли в лог
+    // Добавление мысли
     function addThought(emoji, text) {
         const log = document.getElementById('thoughtLog');
         const item = document.createElement('div');
@@ -308,7 +370,7 @@
             'Оцениваю волатильность рынка...',
         ];
         addThought('🔄', thoughts[Math.floor(Math.random() * thoughts.length)]);
-    }, 15000);
+    }, 20000);
 </script>
 </body>
 </html>
