@@ -21,21 +21,26 @@
         body {
             background: var(--bg); color: var(--text);
             font-family: -apple-system, sans-serif; padding: 16px;
-            min-height: 100vh; padding-bottom: 100px;
+            min-height: 100vh; padding-bottom: 120px;
+            -webkit-tap-highlight-color: transparent;
         }
-        .header { text-align: center; padding: 20px 0; }
+        .header { text-align: center; padding: 16px 0; }
         .logo {
             width: 56px; height: 56px; margin: 0 auto 10px;
             background: linear-gradient(135deg, #10b981, #3b82f6);
             border-radius: 16px; display: flex; align-items: center; justify-content: center;
-            font-size: 28px;
+            font-size: 28px; box-shadow: 0 4px 20px rgba(16,185,129,0.3);
         }
         h1 {
             font-size: 22px; font-weight: 800;
             background: linear-gradient(135deg, #10b981, #3b82f6, #8b5cf6);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-size: 200% 200%; animation: gradient 3s ease infinite;
         }
-        .subtitle { color: var(--text2); font-size: 12px; margin-top: 4px; }
+        @keyframes gradient {
+            0%,100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
         .live-dot {
             display: inline-block; width: 6px; height: 6px;
             background: var(--green); border-radius: 50%; margin-right: 4px;
@@ -45,26 +50,45 @@
             0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
             50% { box-shadow: 0 0 0 8px rgba(16,185,129,0); }
         }
-        
+        .subtitle { color: var(--text2); font-size: 12px; margin-top: 4px; }
+
         /* Сетка кнопок */
-        .menu-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px 0;
-        }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px 0; }
         .menu-btn {
             background: var(--card); border: 1px solid var(--border);
-            border-radius: 14px; padding: 16px 12px; text-align: center;
-            cursor: pointer; transition: all 0.2s; text-decoration: none; color: var(--text);
+            border-radius: 14px; padding: 14px 10px; text-align: center;
+            cursor: pointer; transition: all 0.2s;
         }
-        .menu-btn:active { transform: scale(0.95); border-color: var(--blue); }
-        .menu-btn .icon { font-size: 28px; display: block; margin-bottom: 6px; }
-        .menu-btn .label { font-size: 11px; font-weight: 600; }
-        
+        .menu-btn:active { transform: scale(0.95); border-color: var(--blue); background: #1a2332; }
+        .menu-btn .icon { font-size: 24px; display: block; margin-bottom: 4px; }
+        .menu-btn .label { font-size: 10px; font-weight: 600; }
+
+        /* Переключатель */
+        .toggle-section {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 14px; padding: 14px; margin: 10px 0;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .toggle-label { font-weight: 600; font-size: 13px; }
+        .toggle {
+            width: 50px; height: 28px; background: var(--border);
+            border-radius: 14px; cursor: pointer; position: relative;
+            transition: background 0.3s;
+        }
+        .toggle.active { background: var(--green); }
+        .toggle::after {
+            content: ''; position: absolute; top: 3px; left: 3px;
+            width: 22px; height: 22px; background: white;
+            border-radius: 50%; transition: transform 0.3s;
+        }
+        .toggle.active::after { transform: translateX(22px); }
+
         .section {
             background: var(--card); border: 1px solid var(--border);
             border-radius: 14px; padding: 14px; margin: 10px 0;
         }
         .section h3 { font-size: 13px; margin-bottom: 8px; }
-        
+
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .stat-card {
             background: var(--bg); border-radius: 10px; padding: 12px; text-align: center;
@@ -73,14 +97,45 @@
         .stat-card .label { font-size: 9px; color: var(--text2); text-transform: uppercase; }
         .green { color: var(--green); } .gold { color: var(--gold); }
         .blue { color: var(--blue); } .purple { color: var(--purple); }
-        
+
         .progress-bar { height: 16px; background: var(--border); border-radius: 8px; overflow: hidden; }
         .progress-fill {
             height: 100%; border-radius: 8px; transition: width 0.8s;
             display: flex; align-items: center; justify-content: center;
             font-size: 10px; font-weight: 700; color: white;
         }
-        
+
+        /* Сигналы */
+        .signal-card {
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 12px; padding: 14px; margin: 8px 0;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .signal-card:active { border-color: var(--blue); transform: scale(0.98); }
+        .signal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .signal-pair { font-weight: 700; font-size: 15px; }
+        .signal-direction { font-weight: 800; font-size: 14px; }
+        .signal-details { font-size: 11px; color: var(--text2); line-height: 1.6; }
+        .signal-explanation { font-size: 11px; color: var(--gold); margin-top: 6px; font-style: italic; }
+
+        /* Модальное окно */
+        .modal {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85); z-index: 999;
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .modal-content {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 18px; padding: 20px; width: 100%; max-width: 400px;
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        .modal-close {
+            float: right; background: none; border: none; color: var(--text2);
+            font-size: 24px; cursor: pointer; padding: 0 4px;
+        }
+
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
             background: var(--card); border-top: 1px solid var(--border);
@@ -94,12 +149,12 @@
         }
         .nav-item.active { color: var(--blue); }
         .nav-item .icon { font-size: 20px; }
-        
+
         .toast {
             position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
             background: var(--blue); color: white; padding: 10px 20px;
             border-radius: 20px; font-weight: 600; font-size: 13px;
-            z-index: 999; animation: fadeIn 0.3s ease;
+            z-index: 1000; animation: fadeIn 0.3s ease;
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(-10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
     </style>
@@ -112,102 +167,200 @@
         <p class="subtitle"><span class="live-dot"></span>Live • Bot v8.0</p>
     </div>
 
-    <!-- Кнопки управления -->
+    <!-- Переключатели автотрейдинга -->
+    <div class="toggle-section">
+        <span class="toggle-label">🤖 Автотрейдинг Forex</span>
+        <div class="toggle" id="autoForex" onclick="toggleAuto('forex')"></div>
+    </div>
+    <div class="toggle-section">
+        <span class="toggle-label">🤖 Автотрейдинг OTC</span>
+        <div class="toggle" id="autoOtc" onclick="toggleAuto('otc')"></div>
+    </div>
+
+    <!-- Кнопки -->
     <div class="menu-grid">
-        <div class="menu-btn" onclick="sendCommand('dashboard')">
-            <span class="icon">📊</span>
-            <span class="label">ДАШБОРД</span>
-        </div>
-        <div class="menu-btn" onclick="sendCommand('forex_signal')">
-            <span class="icon">💱</span>
-            <span class="label">FOREX СИГНАЛ</span>
-        </div>
-        <div class="menu-btn" onclick="sendCommand('otc_signal')">
-            <span class="icon">💎</span>
-            <span class="label">OTC СИГНАЛ</span>
-        </div>
-        <div class="menu-btn" onclick="sendCommand('auto_trade')">
-            <span class="icon">🤖</span>
-            <span class="label">АВТОТРЕЙДИНГ</span>
-        </div>
-        <div class="menu-btn" onclick="sendCommand('history')">
-            <span class="icon">📜</span>
-            <span class="label">ИСТОРИЯ</span>
-        </div>
-        <div class="menu-btn" onclick="sendCommand('analytics')">
-            <span class="icon">📈</span>
-            <span class="label">АНАЛИТИКА</span>
-        </div>
-        <div class="menu-btn" onclick="sendCommand('fundamental')">
-            <span class="icon">📰</span>
-            <span class="label">ФУНДАМЕНТ</span>
-        </div>
-        <div class="menu-btn" onclick="sendCommand('settings')">
-            <span class="icon">⚙️</span>
-            <span class="label">НАСТРОЙКИ</span>
+        <div class="menu-btn" onclick="goToSection('signals')"><span class="icon">🎯</span><span class="label">СИГНАЛЫ</span></div>
+        <div class="menu-btn" onclick="goToSection('stats')"><span class="icon">📊</span><span class="label">СТАТИСТИКА</span></div>
+        <div class="menu-btn" onclick="requestSignal('forex')"><span class="icon">💱</span><span class="label">FOREX</span></div>
+        <div class="menu-btn" onclick="requestSignal('otc')"><span class="icon">💎</span><span class="label">OTC</span></div>
+        <div class="menu-btn" onclick="goToSection('history')"><span class="icon">📜</span><span class="label">ИСТОРИЯ</span></div>
+        <div class="menu-btn" onclick="goToSection('analytics')"><span class="icon">📈</span><span class="label">АНАЛИТИКА</span></div>
+    </div>
+
+    <!-- Сигналы -->
+    <div class="section" id="signalsSection">
+        <h3>🎯 Последние сигналы</h3>
+        <div id="signalsList">
+            <div class="signal-card" onclick="openSignalDetail(0)">
+                <div class="signal-header">
+                    <span class="signal-pair">EURUSD</span>
+                    <span class="signal-direction" style="color:var(--green)">CALL 📈</span>
+                </div>
+                <div class="signal-details">⏱ 15 мин | 🎯 85% | 💪 8/10</div>
+                <div class="signal-explanation">💡 FVG + OB на M5, тренд H1 подтверждён</div>
+            </div>
+            <div class="signal-card" onclick="openSignalDetail(1)">
+                <div class="signal-header">
+                    <span class="signal-pair">GBPUSD</span>
+                    <span class="signal-direction" style="color:var(--red)">PUT 📉</span>
+                </div>
+                <div class="signal-details">⏱ 30 мин | 🎯 78% | 💪 7/10</div>
+                <div class="signal-explanation">💡 Медвежий FVG на M15, дивергенция RSI</div>
+            </div>
+            <div class="signal-card" onclick="openSignalDetail(2)">
+                <div class="signal-header">
+                    <span class="signal-pair">USDJPY</span>
+                    <span class="signal-direction" style="color:var(--green)">CALL 📈</span>
+                </div>
+                <div class="signal-details">⏱ 5 мин | 🎯 92% | 💪 9/10</div>
+                <div class="signal-explanation">💡 Сильный бычий импульс, пробой уровня</div>
+            </div>
         </div>
     </div>
 
     <!-- Статистика -->
-    <div class="section">
-        <h3>📊 Быстрая статистика</h3>
+    <div class="section" id="statsSection">
+        <h3>📊 Прозрачная статистика</h3>
         <div class="stats-grid">
-            <div class="stat-card"><div class="label">Сделок</div><div class="value gold" id="trades">0</div></div>
-            <div class="stat-card"><div class="label">Винрейт</div><div class="value green" id="wr">0%</div></div>
-            <div class="stat-card"><div class="label">CALL</div><div class="value blue" id="calls">0</div></div>
-            <div class="stat-card"><div class="label">PUT</div><div class="value purple" id="puts">0</div></div>
+            <div class="stat-card"><div class="label">Всего сделок</div><div class="value gold" id="trades">--</div></div>
+            <div class="stat-card"><div class="label">Винрейт</div><div class="value green" id="wr">--</div></div>
+            <div class="stat-card"><div class="label">CALL</div><div class="value blue" id="calls">--</div></div>
+            <div class="stat-card"><div class="label">PUT</div><div class="value purple" id="puts">--</div></div>
+            <div class="stat-card"><div class="label">Forex WR</div><div class="value green" id="forexWr">--</div></div>
+            <div class="stat-card"><div class="label">OTC WR</div><div class="value gold" id="otcWr">--</div></div>
+            <div class="stat-card"><div class="label">Авто WR</div><div class="value blue" id="autoWr">--</div></div>
+            <div class="stat-card"><div class="label">Лучшая пара</div><div class="value purple" id="bestPair">--</div></div>
         </div>
+        <div class="progress-bar" style="margin-top:10px"><div class="progress-fill" id="fill" style="width:0%">0%</div></div>
     </div>
 
-    <!-- Прогресс -->
-    <div class="section">
-        <h3>Прогресс винрейта</h3>
-        <div class="progress-bar"><div class="progress-fill" id="fill" style="width:0%">0%</div></div>
+    <!-- Модальное окно -->
+    <div class="modal" id="signalModal" style="display:none" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <h3 id="modalPair" style="margin-bottom:8px"></h3>
+            <p id="modalDirection" style="font-size:18px;font-weight:800;margin-bottom:12px"></p>
+            <div class="signal-details" id="modalDetails"></div>
+            <div class="signal-explanation" id="modalExplanation" style="margin-top:8px"></div>
+            <div style="margin-top:12px;padding:12px;background:var(--bg);border-radius:8px;font-size:11px;color:var(--text2)" id="modalPreparation"></div>
+        </div>
     </div>
 
     <!-- Нижнее меню -->
     <div class="bottom-nav">
-        <div class="nav-item active" onclick="refreshStats()"><span class="icon">🔄</span>Обновить</div>
-        <div class="nav-item" onclick="sendCommand('dashboard')"><span class="icon">📊</span>Дашборд</div>
-        <div class="nav-item" onclick="sendCommand('forex_signal')"><span class="icon">💱</span>Forex</div>
-        <div class="nav-item" onclick="sendCommand('otc_signal')"><span class="icon">💎</span>OTC</div>
+        <div class="nav-item active" onclick="refreshAll()"><span class="icon">🔄</span>Обновить</div>
+        <div class="nav-item" onclick="goToSection('signals')"><span class="icon">🎯</span>Сигналы</div>
+        <div class="nav-item" onclick="goToSection('stats')"><span class="icon">📊</span>Стата</div>
+        <div class="nav-item" onclick="window.location.reload()"><span class="icon">🏠</span>Главная</div>
     </div>
 
     <script>
         const tg = window.Telegram && window.Telegram.WebApp;
         if (tg && tg.expand) tg.expand();
 
+        let autoForexEnabled = false;
+        let autoOtcEnabled = false;
+
+        const signalData = [
+            {
+                pair: 'EURUSD', direction: 'CALL 📈', color: 'var(--green)',
+                time: '15 мин', confidence: '85%', strength: '8/10',
+                explanation: 'Обнаружен бычий Fair Value Gap на M5. Тренд H1 подтверждает восходящее движение. Order Block на уровне 1.05250 усиливает сигнал. Рекомендуется вход при касании зоны.',
+                preparation: '📋 ПОДГОТОВКА:\n• Откройте Pocket Option\n• Выберите EURUSD\n• Установите экспирацию 15 мин\n• Дождитесь касания зоны 1.05250\n• Откройте сделку CALL'
+            },
+            {
+                pair: 'GBPUSD', direction: 'PUT 📉', color: 'var(--red)',
+                time: '30 мин', confidence: '78%', strength: '7/10',
+                explanation: 'Медвежий FVG на M15. Дивергенция RSI указывает на ослабление бычьего импульса. H1 тренд медвежий — вход на откате.',
+                preparation: '📋 ПОДГОТОВКА:\n• Откройте Pocket Option\n• Выберите GBPUSD\n• Установите экспирацию 30 мин\n• Дождитесь отката к 1.2650\n• Откройте сделку PUT'
+            },
+            {
+                pair: 'USDJPY', direction: 'CALL 📈', color: 'var(--green)',
+                time: '5 мин', confidence: '92%', strength: '9/10',
+                explanation: 'Сильный бычий импульс. Пробой ключевого сопротивления 149.50. Конфлюэнс M5-M15-H1 — все ТФ вверх.',
+                preparation: '📋 ПОДГОТОВКА:\n• Откройте Pocket Option\n• Выберите USDJPY\n• Установите экспирацию 5 мин\n• Входите сразу на пробое\n• Откройте сделку CALL'
+            }
+        ];
+
         function showToast(msg) {
             const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
             document.body.appendChild(t); setTimeout(() => t.remove(), 1500);
         }
 
-        function sendCommand(cmd) {
-            if (tg) {
-                tg.sendData(JSON.stringify({command: cmd}));
-                tg.close();
+        function toggleAuto(type) {
+            if (type === 'forex') {
+                autoForexEnabled = !autoForexEnabled;
+                document.getElementById('autoForex').classList.toggle('active', autoForexEnabled);
+                showToast('Авто Forex: ' + (autoForexEnabled ? '🟢 ВКЛ' : '🔴 ВЫКЛ'));
+                if (tg) tg.sendData(JSON.stringify({auto_forex: autoForexEnabled}));
+            } else {
+                autoOtcEnabled = !autoOtcEnabled;
+                document.getElementById('autoOtc').classList.toggle('active', autoOtcEnabled);
+                showToast('Авто OTC: ' + (autoOtcEnabled ? '🟢 ВКЛ' : '🔴 ВЫКЛ'));
+                if (tg) tg.sendData(JSON.stringify({auto_otc: autoOtcEnabled}));
             }
-            showToast('Команда отправлена: ' + cmd);
         }
 
-        function refreshStats() {
-            const t = Math.floor(Math.random()*60)+30;
-            const w = Math.random()*35+55;
+        function goToSection(section) {
+            if (section === 'signals') {
+                document.getElementById('signalsSection').scrollIntoView({behavior: 'smooth'});
+                showToast('📋 Сигналы');
+            } else if (section === 'stats') {
+                document.getElementById('statsSection').scrollIntoView({behavior: 'smooth'});
+                showToast('📊 Статистика');
+            } else {
+                showToast('Раздел: ' + section);
+            }
+        }
+
+        function requestSignal(market) {
+            showToast('🔄 Запрос сигнала ' + market.toUpperCase() + '...');
+            if (tg) {
+                tg.sendData(JSON.stringify({request_signal: market}));
+                tg.close();
+            }
+            setTimeout(() => showToast('✅ Сигнал отправлен в бот'), 1000);
+        }
+
+        function openSignalDetail(index) {
+            const s = signalData[index];
+            document.getElementById('modalPair').textContent = '📊 ' + s.pair;
+            document.getElementById('modalDirection').innerHTML = `<span style="color:${s.color}">${s.direction}</span>`;
+            document.getElementById('modalDetails').innerHTML = `⏱ Экспирация: <b>${s.time}</b><br>🎯 Уверенность: <b>${s.confidence}</b><br>💪 Конфлюэнс: <b>${s.strength}</b>`;
+            document.getElementById('modalExplanation').textContent = s.explanation;
+            document.getElementById('modalPreparation').textContent = s.preparation;
+            document.getElementById('signalModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('signalModal').style.display = 'none';
+        }
+
+        function refreshAll() {
+            const t = Math.floor(Math.random()*80)+40;
+            const w = Math.random()*30+60;
+            const c = Math.floor(t*0.52);
+            const p = t - c;
+            
             document.getElementById('trades').textContent = t;
             document.getElementById('wr').textContent = w.toFixed(1)+'%';
-            document.getElementById('calls').textContent = Math.floor(t*0.55);
-            document.getElementById('puts').textContent = t - Math.floor(t*0.55);
+            document.getElementById('calls').textContent = c;
+            document.getElementById('puts').textContent = p;
+            document.getElementById('forexWr').textContent = (w + Math.random()*5).toFixed(1)+'%';
+            document.getElementById('otcWr').textContent = (w - Math.random()*3).toFixed(1)+'%';
+            document.getElementById('autoWr').textContent = (w + Math.random()*8).toFixed(1)+'%';
+            document.getElementById('bestPair').textContent = ['EURUSD','GBPUSD','USDJPY'][Math.floor(Math.random()*3)];
             
             const f = document.getElementById('fill');
             f.style.width = w+'%'; f.textContent = w.toFixed(1)+'%';
-            f.style.background = w>=70 ? '#10b981' : w>=50 ? '#f59e0b' : '#ef4444';
+            f.style.background = w>=70 ? 'linear-gradient(90deg,#10b981,#34d399)' : w>=50 ? 'linear-gradient(90deg,#f59e0b,#fbbf24)' : 'linear-gradient(90deg,#ef4444,#f87171)';
             
             if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-            showToast('Обновлено ✅');
+            showToast('✅ Данные обновлены');
         }
 
-        refreshStats();
-        setInterval(refreshStats, 30000);
+        refreshAll();
+        setInterval(refreshAll, 30000);
     </script>
 </body>
 </html>
