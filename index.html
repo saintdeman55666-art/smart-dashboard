@@ -119,6 +119,13 @@
         }
         .risk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         canvas { max-height: 200px; }
+        .spinner {
+            display: inline-block; width: 16px; height: 16px;
+            border: 2px solid var(--border); border-top-color: var(--blue);
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+            vertical-align: middle; margin-right: 6px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -140,6 +147,14 @@
         </div>
     </div>
 
+    <div class="section">
+        <h3>💰 Риски</h3>
+        <div class="risk-grid">
+            <div class="stat-card"><div class="label">Баланс</div><div class="value gold">$<span id="bal">1000</span></div></div>
+            <div class="stat-card"><div class="label">Позиция</div><div class="value green">$<span id="pos">20</span></div></div>
+        </div>
+    </div>
+
     <button class="btn btn-premium" onclick="requestStats()">📊 ЗАПРОСИТЬ СТАТИСТИКУ</button>
     <button class="btn btn-green" onclick="startSearch('forex')">💱 АВТО-ПОИСК FOREX</button>
     <button class="btn btn-gold" onclick="startSearch('otc')">💎 АВТО-ПОИСК OTC</button>
@@ -151,6 +166,32 @@
     <button class="btn btn-outline" onclick="openPage('backtest')">🧪 БЭКТЕСТ</button>
 </div>
 
+<!-- АВТО -->
+<div class="page" id="page-auto">
+    <div class="header"><h2>🤖 Авто-трейдинг</h2></div>
+    <div class="section">
+        <div class="toggle-row"><span>💱 Forex</span><div class="toggle" id="tf" onclick="toggleAuto('forex')"></div></div>
+        <div class="toggle-row"><span>💎 OTC</span><div class="toggle" id="to" onclick="toggleAuto('otc')"></div></div>
+    </div>
+    <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
+</div>
+
+<!-- ЛОГ -->
+<div class="page" id="page-log">
+    <div class="header"><h2>🧠 Ход размышлений</h2></div>
+    <div class="section"><div class="thought-log" id="thoughtLog"><div class="thought-item">🟢 Бот v14.0 запущен. Анти-сон активен.</div></div></div>
+    <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
+</div>
+
+<!-- СИГНАЛЫ -->
+<div class="page" id="page-signals">
+    <div class="header"><h2>📋 Сигналы</h2></div>
+    <div class="section"><h3>⏳ ГОТОВЯТСЯ</h3><div id="preparingList"><div class="signal-card">Нет</div></div></div>
+    <div class="section"><h3>🔥 В РАБОТЕ</h3><div id="openedList"><div class="signal-card">Нет</div></div></div>
+    <div class="section"><h3>✅ ЗАВЕРШЁННЫЕ</h3><div id="closedList"><div class="signal-card">Нет</div></div></div>
+    <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
+</div>
+
 <!-- ГРАФИКИ -->
 <div class="page" id="page-charts">
     <div class="header"><h2>📈 Графики</h2></div>
@@ -159,8 +200,48 @@
     <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
 </div>
 
-<!-- (Остальные вкладки идентичны v13.2) -->
+<!-- РИСКИ -->
+<div class="page" id="page-risk">
+    <div class="header"><h2>⚙️ Риски</h2></div>
+    <div class="section">
+        <h3>💰 Баланс</h3>
+        <input type="number" id="riskBalanceInput" value="1000">
+        <button class="btn btn-green" onclick="updateBalance()">💾 СОХРАНИТЬ</button>
+    </div>
+    <div class="section">
+        <h3>📊 Риск (%)</h3>
+        <input type="number" id="riskPctInput" value="2" step="0.5">
+        <button class="btn btn-green" onclick="updateRisk()">💾 СОХРАНИТЬ</button>
+    </div>
+    <div class="section">
+        <div class="risk-grid">
+            <div class="stat-card"><div class="label">Баланс</div><div class="value gold" id="rb">$1000</div></div>
+            <div class="stat-card"><div class="label">Риск</div><div class="value green"><span id="rr">2</span>%</div></div>
+            <div class="stat-card"><div class="label">Позиция</div><div class="value blue" id="rpos">$20</div></div>
+        </div>
+    </div>
+    <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
+</div>
 
+<!-- БЭКТЕСТ -->
+<div class="page" id="page-backtest">
+    <div class="header"><h2>🧪 Бэктест</h2></div>
+    <button class="btn btn-green" onclick="runBacktest()">🧪 ЗАПУСТИТЬ</button>
+    <div id="btResult" style="margin-top:10px;font-size:12px"></div>
+    <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
+</div>
+
+<!-- МОДАЛКА -->
+<div class="modal" id="signalModal" onclick="closeModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <h3 id="modTitle"></h3>
+        <p id="modBody" style="font-size:13px;margin:10px 0"></p>
+        <div id="modPrep" style="font-size:11px;color:var(--gold);background:var(--bg);padding:10px;border-radius:8px"></div>
+    </div>
+</div>
+
+<!-- НИЖНЕЕ МЕНЮ -->
 <div class="bottom-nav">
     <div class="nav-item active" onclick="openPage('home')"><span class="icon">🏠</span>Главная</div>
     <div class="nav-item" onclick="openPage('auto')"><span class="icon">🤖</span>Авто</div>
