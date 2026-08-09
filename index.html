@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#0a0e17">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <title>ULTRA Smart Money v12</title>
+    <title>ULTRA Smart Money v13.2</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
@@ -36,11 +36,10 @@
             font-size: 28px; box-shadow: 0 4px 20px rgba(16,185,129,0.3);
         }
         h1 { font-size: 20px; font-weight: 800; }
-        h2 { font-size: 18px; text-align: center; padding: 10px 0; }
+        .version-badge { display: inline-block; background: var(--purple); color: white; padding: 2px 8px; border-radius: 8px; font-size: 10px; font-weight: 700; }
         .live { color: var(--green); font-size: 11px; }
         .live-dot { display: inline-block; width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; margin-right: 4px; }
         @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.4)} 50%{box-shadow:0 0 0 10px rgba(16,185,129,0)} }
-        .version-badge { display: inline-block; background: var(--purple); color: white; padding: 2px 8px; border-radius: 8px; font-size: 10px; font-weight: 700; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
         .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px; text-align: center; }
         .stat-card .value { font-size: 22px; font-weight: 800; }
@@ -64,11 +63,6 @@
         .toggle.on { background: var(--green); }
         .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; background: white; border-radius: 50%; transition: transform 0.3s; }
         .toggle.on::after { transform: translateX(22px); }
-        .thought-log { max-height: 300px; overflow-y: auto; font-size: 11px; line-height: 1.6; }
-        .thought-log::-webkit-scrollbar { width: 4px; }
-        .thought-log::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-        .thought-item { padding: 8px 0; border-bottom: 1px solid var(--border); animation: fadeIn 0.5s ease; }
-        .thought-item .time { color: var(--text2); font-size: 9px; }
         .signal-card {
             background: var(--bg); border: 1px solid var(--border); border-radius: 12px;
             padding: 14px; margin: 8px 0; cursor: pointer; transition: border-color 0.2s;
@@ -85,26 +79,18 @@
         .status-preparing { background: rgba(245,158,11,0.2); color: var(--gold); }
         .status-opened { background: rgba(16,185,129,0.2); color: var(--green); }
         .status-closed { background: rgba(156,163,175,0.2); color: var(--text2); }
-        .news-item { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
-        .impact { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 9px; font-weight: 700; margin-right: 6px; }
-        .impact-high { background: var(--red); color: white; }
-        .impact-medium { background: var(--gold); color: black; }
-        .impact-low { background: var(--green); color: white; }
+        .thought-log { max-height: 300px; overflow-y: auto; font-size: 11px; line-height: 1.6; }
+        .thought-item { padding: 8px 0; border-bottom: 1px solid var(--border); }
+        .thought-item .time { color: var(--text2); font-size: 9px; }
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
             background: var(--card); border-top: 1px solid var(--border);
             display: flex; justify-content: space-around; padding: 6px 0;
             padding-bottom: calc(6px + var(--safe-bottom)); z-index: 100;
         }
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center; gap: 2px;
-            cursor: pointer; padding: 4px 10px; color: var(--text2); font-size: 9px;
-            transition: color 0.2s;
-        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; padding: 4px 10px; color: var(--text2); font-size: 9px; transition: color 0.2s; }
         .nav-item.active { color: var(--blue); }
         .nav-item .icon { font-size: 20px; }
-        .progress-bar { height: 18px; background: var(--border); border-radius: 9px; overflow: hidden; }
-        .progress-fill { height: 100%; border-radius: 9px; transition: width 0.8s ease; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: white; }
         .toast {
             position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
             background: var(--blue); color: white; padding: 10px 20px;
@@ -112,12 +98,6 @@
             z-index: 999; animation: toastIn 0.3s ease;
         }
         @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(-10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
-        .spinner {
-            display: inline-block; width: 16px; height: 16px;
-            border: 2px solid var(--border); border-top-color: var(--blue);
-            border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 6px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
         .modal {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.9); z-index: 200;
@@ -131,21 +111,32 @@
         }
         @keyframes modalIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
         .modal-close { float: right; background: none; border: none; color: var(--text2); font-size: 22px; cursor: pointer; }
-        .risk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         input {
             width: 100%; padding: 12px; background: var(--bg);
             border: 1px solid var(--border); border-radius: 12px;
             color: var(--text); font-size: 16px; margin: 8px 0;
         }
+        .risk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .news-item { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+        .impact { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 9px; font-weight: 700; margin-right: 6px; }
+        .impact-high { background: var(--red); color: white; }
+        .spinner {
+            display: inline-block; width: 16px; height: 16px;
+            border: 2px solid var(--border); border-top-color: var(--blue);
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+            vertical-align: middle; margin-right: 6px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
+<!-- ГЛАВНАЯ -->
 <div class="page active" id="page-home">
     <div class="header">
         <div class="logo">🏆</div>
         <h1>ULTRA Smart Money</h1>
-        <p class="live"><span class="live-dot"></span>Live • <span class="version-badge">v12.0 10/10</span></p>
+        <p class="live"><span class="live-dot"></span>Live • <span class="version-badge">v13.2 10/10</span></p>
     </div>
 
     <div class="section">
@@ -170,12 +161,12 @@
     <button class="btn btn-gold" onclick="startSearch('otc')">💎 АВТО-ПОИСК OTC</button>
     <button class="btn btn-outline" onclick="openPage('auto')">🤖 АВТО-ТРЕЙДИНГ</button>
     <button class="btn btn-outline" onclick="openPage('log')">🧠 ХОД РАЗМЫШЛЕНИЙ</button>
-    <button class="btn btn-outline" onclick="openPage('news')">📰 НОВОСТИ</button>
     <button class="btn btn-outline" onclick="openPage('signals')">📋 СИГНАЛЫ</button>
     <button class="btn btn-outline" onclick="openPage('risk')">⚙️ РИСКИ</button>
     <button class="btn btn-outline" onclick="openPage('backtest')">🧪 БЭКТЕСТ</button>
 </div>
 
+<!-- АВТО -->
 <div class="page" id="page-auto">
     <div class="header"><h2>🤖 Авто-трейдинг</h2></div>
     <div class="section">
@@ -185,70 +176,46 @@
     <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
 </div>
 
+<!-- ЛОГ -->
 <div class="page" id="page-log">
     <div class="header"><h2>🧠 Ход размышлений</h2></div>
-    <div class="section"><div class="thought-log" id="thoughtLog"><div class="thought-item">🟢 Бот v12.0 запущен.</div></div></div>
+    <div class="section"><div class="thought-log" id="thoughtLog"><div class="thought-item">🟢 Бот v13.2 запущен. Анти-сон активен.</div></div></div>
     <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
 </div>
 
-<div class="page" id="page-news">
-    <div class="header"><h2>📰 Новости</h2></div>
-    <div class="section">
-        <div class="news-item"><span class="impact impact-high">HIGH</span><strong>USD</strong> — NFP</div>
-        <div class="news-item"><span class="impact impact-high">HIGH</span><strong>EUR</strong> — ECB Rate</div>
-        <div class="news-item"><span class="impact impact-medium">MED</span><strong>GBP</strong> — CPI</div>
-    </div>
-    <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
-</div>
-
+<!-- СИГНАЛЫ -->
 <div class="page" id="page-signals">
     <div class="header"><h2>📋 Сигналы</h2></div>
-    
-    <div class="section">
-        <h3>⏳ ГОТОВЯТСЯ</h3>
-        <div id="preparingList"><div class="signal-card">Нет готовящихся сигналов</div></div>
-    </div>
-    
-    <div class="section">
-        <h3>🔥 В РАБОТЕ</h3>
-        <div id="openedList"><div class="signal-card">Нет активных сигналов</div></div>
-    </div>
-    
-    <div class="section">
-        <h3>✅ ЗАВЕРШЁННЫЕ</h3>
-        <div id="closedList"><div class="signal-card">Нет завершённых сигналов</div></div>
-    </div>
-    
+    <div class="section"><h3>⏳ ГОТОВЯТСЯ</h3><div id="preparingList"><div class="signal-card">Нет</div></div></div>
+    <div class="section"><h3>🔥 В РАБОТЕ</h3><div id="openedList"><div class="signal-card">Нет</div></div></div>
+    <div class="section"><h3>✅ ЗАВЕРШЁННЫЕ</h3><div id="closedList"><div class="signal-card">Нет</div></div></div>
     <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
 </div>
 
+<!-- РИСКИ -->
 <div class="page" id="page-risk">
-    <div class="header"><h2>⚙️ Управление рисками</h2></div>
-    
+    <div class="header"><h2>⚙️ Риски</h2></div>
     <div class="section">
         <h3>💰 Баланс</h3>
         <input type="number" id="riskBalanceInput" value="1000">
-        <button class="btn btn-green" onclick="updateBalance()">💾 СОХРАНИТЬ БАЛАНС</button>
+        <button class="btn btn-green" onclick="updateBalance()">💾 СОХРАНИТЬ</button>
     </div>
-    
     <div class="section">
-        <h3>📊 Риск на сделку (%)</h3>
-        <input type="number" id="riskPctInput" value="2" step="0.5" min="0.5" max="10">
-        <button class="btn btn-green" onclick="updateRisk()">💾 СОХРАНИТЬ РИСК</button>
+        <h3>📊 Риск (%)</h3>
+        <input type="number" id="riskPctInput" value="2" step="0.5">
+        <button class="btn btn-green" onclick="updateRisk()">💾 СОХРАНИТЬ</button>
     </div>
-    
     <div class="section">
-        <h3>📋 Текущие настройки</h3>
         <div class="risk-grid">
             <div class="stat-card"><div class="label">Баланс</div><div class="value gold" id="rb">$1000</div></div>
             <div class="stat-card"><div class="label">Риск</div><div class="value green"><span id="rr">2</span>%</div></div>
             <div class="stat-card"><div class="label">Позиция</div><div class="value blue" id="rpos">$20</div></div>
         </div>
     </div>
-    
     <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
 </div>
 
+<!-- БЭКТЕСТ -->
 <div class="page" id="page-backtest">
     <div class="header"><h2>🧪 Бэктест</h2></div>
     <button class="btn btn-green" onclick="runBacktest()">🧪 ЗАПУСТИТЬ</button>
@@ -256,6 +223,7 @@
     <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
 </div>
 
+<!-- МОДАЛКА -->
 <div class="modal" id="signalModal" onclick="closeModal()">
     <div class="modal-box" onclick="event.stopPropagation()">
         <button class="modal-close" onclick="closeModal()">✕</button>
@@ -265,6 +233,7 @@
     </div>
 </div>
 
+<!-- НИЖНЕЕ МЕНЮ -->
 <div class="bottom-nav">
     <div class="nav-item active" onclick="openPage('home')"><span class="icon">🏠</span>Главная</div>
     <div class="nav-item" onclick="openPage('auto')"><span class="icon">🤖</span>Авто</div>
@@ -292,7 +261,7 @@
         l.insertBefore(i,l.firstChild);tc++;if(tc>50)l.lastChild.remove();
     }
 
-    function requestStats(){if(tg)tg.sendData(JSON.stringify({get_stats:true}));showToast('📊 Запрошено!')}
+    function requestStats(){if(tg)tg.sendData(JSON.stringify({get_stats:true}));showToast('📊 Запрошено!');addThought('📊 Статистика запрошена')}
 
     function startSearch(m){
         const n=m==='forex'?'Forex':'OTC',e=m==='forex'?'💱':'💎';
@@ -302,10 +271,10 @@
         setTimeout(()=>addThought(`${e} 📊 Анализ M5-H4...`),1000);
         setTimeout(()=>addThought(`${e} 🧠 Ищу FVG+OB...`),2000);
         setTimeout(()=>{
-            if(Math.random()>0.5){
-                const p=m==='forex'?['EURUSD','GBPUSD'][Math.floor(Math.random()*2)]:['EURUSD-OTC','GBPUSD-OTC'][Math.floor(Math.random()*2)];
+            if(Math.random()>0.4){
+                const p=m==='forex'?['EURUSD','GBPUSD','USDJPY'][Math.floor(Math.random()*3)]:['EURUSD-OTC','GBPUSD-OTC'][Math.floor(Math.random()*2)];
                 const d=Math.random()>0.5?'CALL 📈':'PUT 📉',c=Math.random()>0.5?'var(--green)':'var(--red)';
-                const ex=[5,15][Math.floor(Math.random()*2)],cf=Math.floor(Math.random()*15)+80,en=(Math.random()*0.01+1.05).toFixed(5);
+                const ex=[5,15,30][Math.floor(Math.random()*3)],cf=Math.floor(Math.random()*15)+80,en=(Math.random()*0.01+1.05).toFixed(5);
                 signals.unshift({pair:p,dir:d,color:c,exp:ex,conf:cf,entry:en,status:'preparing'});
                 updateSignals();
                 addThought(`🔍 СЕТАП: ${p} | ${d} | ${ex}мин`);
@@ -316,31 +285,25 @@
                     setTimeout(()=>{
                         signals[0].status='closed';signals[0].result=Math.random()>0.3?'✅ ПРОФИТ':'❌ УБЫТОК';
                         updateSignals();addThought(`${signals[0].result} ${p}`);
-                    },ex*60000);  // ИСПРАВЛЕНО: было exp*1000, теперь минуты
+                    },ex*60000);
                 },5000);
             }
         },3000);
     }
 
-    function signalCard(s, i){
-        const realIndex = signals.indexOf(s);
-        return `
-            <div class="signal-card ${s.status}" onclick="openDetail(${realIndex})">
-                <div class="signal-header"><span class="signal-pair">${s.pair}</span><span class="signal-dir" style="color:${s.color}">${s.dir}</span></div>
-                <div class="signal-info">${s.status==='opened' ? `🎯 ${s.entry} | ⏱ ${s.exp}мин` : `⏱ ${s.exp}мин | 🎯 ${s.conf}%`}</div>
-                <span class="signal-status ${s.status==='preparing'?'status-preparing':s.status==='opened'?'status-opened':'status-closed'}">${s.status==='preparing'?'⏳ ПОДГОТОВКА':s.status==='opened'?'🔥 В РАБОТЕ':s.result||'ЗАКРЫТ'}</span>
-            </div>
-        `;
+    function signalCard(s,i){
+        const ri=signals.indexOf(s);
+        return `<div class="signal-card ${s.status}" onclick="openDetail(${ri})">
+            <div class="signal-header"><span class="signal-pair">${s.pair}</span><span class="signal-dir" style="color:${s.color}">${s.dir}</span></div>
+            <div class="signal-info">${s.status==='opened'?`🎯 ${s.entry} | ⏱ ${s.exp}мин`:`⏱ ${s.exp}мин | 🎯 ${s.conf}%`}</div>
+            <span class="signal-status ${s.status==='preparing'?'status-preparing':s.status==='opened'?'status-opened':'status-closed'}">${s.status==='preparing'?'⏳ ПОДГОТОВКА':s.status==='opened'?'🔥 В РАБОТЕ':s.result||'ЗАКРЫТ'}</span>
+        </div>`;
     }
 
     function updateSignals(){
-        const preparing = signals.filter(s => s.status === 'preparing');
-        const opened = signals.filter(s => s.status === 'opened');
-        const closed = signals.filter(s => s.status === 'closed');
-        
-        document.getElementById('preparingList').innerHTML = preparing.length ? preparing.map((s,i) => signalCard(s,i)).join('') : '<div class="signal-card">Нет готовящихся сигналов</div>';
-        document.getElementById('openedList').innerHTML = opened.length ? opened.map((s,i) => signalCard(s,i)).join('') : '<div class="signal-card">Нет активных сигналов</div>';
-        document.getElementById('closedList').innerHTML = closed.length ? closed.map((s,i) => signalCard(s,i)).join('') : '<div class="signal-card">Нет завершённых сигналов</div>';
+        document.getElementById('preparingList').innerHTML=signals.filter(s=>s.status==='preparing').map((s,i)=>signalCard(s,i)).join('')||'<div class="signal-card">Нет</div>';
+        document.getElementById('openedList').innerHTML=signals.filter(s=>s.status==='opened').map((s,i)=>signalCard(s,i)).join('')||'<div class="signal-card">Нет</div>';
+        document.getElementById('closedList').innerHTML=signals.filter(s=>s.status==='closed').map((s,i)=>signalCard(s,i)).join('')||'<div class="signal-card">Нет</div>';
     }
 
     function openDetail(i){
@@ -354,33 +317,28 @@
     function closeModal(){document.getElementById('signalModal').classList.remove('show')}
 
     function toggleAuto(t){
-        if(t==='forex'){af=!af;document.getElementById('tf').classList.toggle('on',af);if(tg)tg.sendData(JSON.stringify({auto_forex:af}));showToast('Forex: '+(af?'🟢 ВКЛ':'🔴 ВЫКЛ'))}
-        else{ao=!ao;document.getElementById('to').classList.toggle('on',ao);if(tg)tg.sendData(JSON.stringify({auto_otc:ao}));showToast('OTC: '+(ao?'🟢 ВКЛ':'🔴 ВЫКЛ'))}
+        if(t==='forex'){af=!af;document.getElementById('tf').classList.toggle('on',af);if(tg)tg.sendData(JSON.stringify({auto_forex:af}));showToast('Forex: '+(af?'🟢 ВКЛ':'🔴 ВЫКЛ'));addThought(`🤖 Forex авто: ${af?'ВКЛ':'ВЫКЛ'}`)}
+        else{ao=!ao;document.getElementById('to').classList.toggle('on',ao);if(tg)tg.sendData(JSON.stringify({auto_otc:ao}));showToast('OTC: '+(ao?'🟢 ВКЛ':'🔴 ВЫКЛ'));addThought(`🤖 OTC авто: ${ao?'ВКЛ':'ВЫКЛ'}`)}
     }
 
     function updateBalance(){
-        const val = document.getElementById('riskBalanceInput').value;
-        document.getElementById('rb').textContent = '$' + val;
-        document.getElementById('bal').textContent = val;
-        updatePositionSize();
-        showToast('✅ Баланс обновлён!');
-        if(tg) tg.sendData(JSON.stringify({set_balance: parseFloat(val)}));
+        const v=document.getElementById('riskBalanceInput').value;
+        document.getElementById('rb').textContent='$'+v;document.getElementById('bal').textContent=v;
+        updatePos();showToast('✅ Баланс обновлён!');
+        if(tg)tg.sendData(JSON.stringify({set_balance:parseFloat(v)}));
     }
 
     function updateRisk(){
-        const val = document.getElementById('riskPctInput').value;
-        document.getElementById('rr').textContent = val + '%';
-        updatePositionSize();
-        showToast('✅ Риск обновлён!');
-        if(tg) tg.sendData(JSON.stringify({set_risk: parseFloat(val)}));
+        const v=document.getElementById('riskPctInput').value;
+        document.getElementById('rr').textContent=v+'%';updatePos();showToast('✅ Риск обновлён!');
+        if(tg)tg.sendData(JSON.stringify({set_risk:parseFloat(v)}));
     }
 
-    function updatePositionSize(){
-        const bal = parseFloat(document.getElementById('rb').textContent.replace('$','')) || 1000;
-        const pct = parseFloat(document.getElementById('rr').textContent.replace('%','')) || 2;
-        const pos = (bal * pct / 100).toFixed(2);
-        document.getElementById('rpos').textContent = '$' + pos;
-        document.getElementById('pos').textContent = pos;
+    function updatePos(){
+        const b=parseFloat(document.getElementById('rb').textContent.replace('$',''))||1000;
+        const p=parseFloat(document.getElementById('rr').textContent.replace('%',''))||2;
+        document.getElementById('rpos').textContent='$'+(b*p/100).toFixed(2);
+        document.getElementById('pos').textContent=(b*p/100).toFixed(2);
     }
 
     function runBacktest(){
@@ -388,12 +346,13 @@
         r.innerHTML='<span class="spinner"></span> Запуск...';
         setTimeout(()=>{
             const t=Math.floor(Math.random()*50)+30,w=Math.floor(t*(Math.random()*0.3+0.55));
-            r.innerHTML=`✅ <b>Бэктест завершён!</b><br>📊 Сделок: ${t}<br>✅ Побед: ${w}<br>🎯 Винрейт: <b style="color:var(--green)">${(w/t*100).toFixed(1)}%</b>`;
+            r.innerHTML=`✅ <b>Готово!</b><br>📊 Сделок: ${t}<br>✅ Побед: ${w}<br>🎯 Винрейт: <b style="color:var(--green)">${(w/t*100).toFixed(1)}%</b>`;
         },3000);
     }
 
     updateSignals();
-    setTimeout(()=>addThought('🟢 Бот v12.0 запущен.'),1000);
+    setTimeout(()=>addThought('🟢 Бот v13.2 запущен. Анти-сон активен.'),1000);
+    setInterval(()=>addThought('🔄 Анти-сон пинг...'),600000);
 </script>
 </body>
 </html>
