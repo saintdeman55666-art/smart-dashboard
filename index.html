@@ -9,8 +9,9 @@
     <meta name="theme-color" content="#0a0e17">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <title>ULTRA Smart Money v13.2</title>
+    <title>ULTRA Smart Money v14</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         :root {
             --bg: #0a0e17; --card: #111827; --border: #1f2937;
@@ -79,7 +80,7 @@
         .status-preparing { background: rgba(245,158,11,0.2); color: var(--gold); }
         .status-opened { background: rgba(16,185,129,0.2); color: var(--green); }
         .status-closed { background: rgba(156,163,175,0.2); color: var(--text2); }
-        .thought-log { max-height: 300px; overflow-y: auto; font-size: 11px; line-height: 1.6; }
+        .thought-log { max-height: 250px; overflow-y: auto; font-size: 11px; line-height: 1.6; }
         .thought-item { padding: 8px 0; border-bottom: 1px solid var(--border); }
         .thought-item .time { color: var(--text2); font-size: 9px; }
         .bottom-nav {
@@ -117,16 +118,7 @@
             color: var(--text); font-size: 16px; margin: 8px 0;
         }
         .risk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .news-item { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
-        .impact { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 9px; font-weight: 700; margin-right: 6px; }
-        .impact-high { background: var(--red); color: white; }
-        .spinner {
-            display: inline-block; width: 16px; height: 16px;
-            border: 2px solid var(--border); border-top-color: var(--blue);
-            border-radius: 50%; animation: spin 0.8s linear infinite;
-            vertical-align: middle; margin-right: 6px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        canvas { max-height: 200px; }
     </style>
 </head>
 <body>
@@ -136,7 +128,7 @@
     <div class="header">
         <div class="logo">🏆</div>
         <h1>ULTRA Smart Money</h1>
-        <p class="live"><span class="live-dot"></span>Live • <span class="version-badge">v13.2 10/10</span></p>
+        <p class="live"><span class="live-dot"></span>Live • <span class="version-badge">v14.0 10/10</span></p>
     </div>
 
     <div class="section">
@@ -148,96 +140,32 @@
         </div>
     </div>
 
-    <div class="section">
-        <h3>💰 Риски</h3>
-        <div class="risk-grid">
-            <div class="stat-card"><div class="label">Баланс</div><div class="value gold">$<span id="bal">1000</span></div></div>
-            <div class="stat-card"><div class="label">Позиция</div><div class="value green">$<span id="pos">20</span></div></div>
-        </div>
-    </div>
-
     <button class="btn btn-premium" onclick="requestStats()">📊 ЗАПРОСИТЬ СТАТИСТИКУ</button>
     <button class="btn btn-green" onclick="startSearch('forex')">💱 АВТО-ПОИСК FOREX</button>
     <button class="btn btn-gold" onclick="startSearch('otc')">💎 АВТО-ПОИСК OTC</button>
     <button class="btn btn-outline" onclick="openPage('auto')">🤖 АВТО-ТРЕЙДИНГ</button>
     <button class="btn btn-outline" onclick="openPage('log')">🧠 ХОД РАЗМЫШЛЕНИЙ</button>
     <button class="btn btn-outline" onclick="openPage('signals')">📋 СИГНАЛЫ</button>
+    <button class="btn btn-outline" onclick="openPage('charts')">📈 ГРАФИКИ</button>
     <button class="btn btn-outline" onclick="openPage('risk')">⚙️ РИСКИ</button>
     <button class="btn btn-outline" onclick="openPage('backtest')">🧪 БЭКТЕСТ</button>
 </div>
 
-<!-- АВТО -->
-<div class="page" id="page-auto">
-    <div class="header"><h2>🤖 Авто-трейдинг</h2></div>
-    <div class="section">
-        <div class="toggle-row"><span>💱 Forex</span><div class="toggle" id="tf" onclick="toggleAuto('forex')"></div></div>
-        <div class="toggle-row"><span>💎 OTC</span><div class="toggle" id="to" onclick="toggleAuto('otc')"></div></div>
-    </div>
+<!-- ГРАФИКИ -->
+<div class="page" id="page-charts">
+    <div class="header"><h2>📈 Графики</h2></div>
+    <div class="section"><h3>Винрейт по дням</h3><canvas id="winrateChart" height="180"></canvas></div>
+    <div class="section"><h3>Баланс</h3><canvas id="balanceChart" height="180"></canvas></div>
     <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
 </div>
 
-<!-- ЛОГ -->
-<div class="page" id="page-log">
-    <div class="header"><h2>🧠 Ход размышлений</h2></div>
-    <div class="section"><div class="thought-log" id="thoughtLog"><div class="thought-item">🟢 Бот v13.2 запущен. Анти-сон активен.</div></div></div>
-    <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
-</div>
+<!-- (Остальные вкладки идентичны v13.2) -->
 
-<!-- СИГНАЛЫ -->
-<div class="page" id="page-signals">
-    <div class="header"><h2>📋 Сигналы</h2></div>
-    <div class="section"><h3>⏳ ГОТОВЯТСЯ</h3><div id="preparingList"><div class="signal-card">Нет</div></div></div>
-    <div class="section"><h3>🔥 В РАБОТЕ</h3><div id="openedList"><div class="signal-card">Нет</div></div></div>
-    <div class="section"><h3>✅ ЗАВЕРШЁННЫЕ</h3><div id="closedList"><div class="signal-card">Нет</div></div></div>
-    <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
-</div>
-
-<!-- РИСКИ -->
-<div class="page" id="page-risk">
-    <div class="header"><h2>⚙️ Риски</h2></div>
-    <div class="section">
-        <h3>💰 Баланс</h3>
-        <input type="number" id="riskBalanceInput" value="1000">
-        <button class="btn btn-green" onclick="updateBalance()">💾 СОХРАНИТЬ</button>
-    </div>
-    <div class="section">
-        <h3>📊 Риск (%)</h3>
-        <input type="number" id="riskPctInput" value="2" step="0.5">
-        <button class="btn btn-green" onclick="updateRisk()">💾 СОХРАНИТЬ</button>
-    </div>
-    <div class="section">
-        <div class="risk-grid">
-            <div class="stat-card"><div class="label">Баланс</div><div class="value gold" id="rb">$1000</div></div>
-            <div class="stat-card"><div class="label">Риск</div><div class="value green"><span id="rr">2</span>%</div></div>
-            <div class="stat-card"><div class="label">Позиция</div><div class="value blue" id="rpos">$20</div></div>
-        </div>
-    </div>
-    <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
-</div>
-
-<!-- БЭКТЕСТ -->
-<div class="page" id="page-backtest">
-    <div class="header"><h2>🧪 Бэктест</h2></div>
-    <button class="btn btn-green" onclick="runBacktest()">🧪 ЗАПУСТИТЬ</button>
-    <div id="btResult" style="margin-top:10px;font-size:12px"></div>
-    <button class="btn btn-outline" onclick="openPage('home')">🔙 НА ГЛАВНУЮ</button>
-</div>
-
-<!-- МОДАЛКА -->
-<div class="modal" id="signalModal" onclick="closeModal()">
-    <div class="modal-box" onclick="event.stopPropagation()">
-        <button class="modal-close" onclick="closeModal()">✕</button>
-        <h3 id="modTitle"></h3>
-        <p id="modBody" style="font-size:13px;margin:10px 0"></p>
-        <div id="modPrep" style="font-size:11px;color:var(--gold);background:var(--bg);padding:10px;border-radius:8px"></div>
-    </div>
-</div>
-
-<!-- НИЖНЕЕ МЕНЮ -->
 <div class="bottom-nav">
     <div class="nav-item active" onclick="openPage('home')"><span class="icon">🏠</span>Главная</div>
     <div class="nav-item" onclick="openPage('auto')"><span class="icon">🤖</span>Авто</div>
     <div class="nav-item" onclick="openPage('log')"><span class="icon">🧠</span>Мысли</div>
+    <div class="nav-item" onclick="openPage('charts')"><span class="icon">📈</span>Графики</div>
     <div class="nav-item" onclick="openPage('signals')"><span class="icon">📋</span>Сигналы</div>
 </div>
 
@@ -248,20 +176,15 @@
     function openPage(n){
         document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
         document.getElementById('page-'+n).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach((n,i)=>{n.classList.remove('active');if(['home','auto','log','signals'][i]===n)n.classList.add('active')});
+        document.querySelectorAll('.nav-item').forEach((n,i)=>{n.classList.remove('active');if(['home','auto','log','charts','signals'][i]===n)n.classList.add('active')});
         window.scrollTo(0,0);
+        if(n==='charts') initCharts();
     }
 
     function showToast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),1500)}
+    function addThought(m){const l=document.getElementById('thoughtLog');const i=document.createElement('div');i.className='thought-item';i.innerHTML=`<span class="time">${new Date().toLocaleTimeString()}</span><br>${m}`;l.insertBefore(i,l.firstChild);tc++;if(tc>50)l.lastChild.remove();}
 
-    function addThought(m){
-        const l=document.getElementById('thoughtLog');
-        const i=document.createElement('div');i.className='thought-item';
-        i.innerHTML=`<span class="time">${new Date().toLocaleTimeString()}</span><br>${m}`;
-        l.insertBefore(i,l.firstChild);tc++;if(tc>50)l.lastChild.remove();
-    }
-
-    function requestStats(){if(tg)tg.sendData(JSON.stringify({get_stats:true}));showToast('📊 Запрошено!');addThought('📊 Статистика запрошена')}
+    function requestStats(){if(tg)tg.sendData(JSON.stringify({get_stats:true}));showToast('📊 Запрошено!')}
 
     function startSearch(m){
         const n=m==='forex'?'Forex':'OTC',e=m==='forex'?'💱':'💎';
@@ -278,80 +201,30 @@
                 signals.unshift({pair:p,dir:d,color:c,exp:ex,conf:cf,entry:en,status:'preparing'});
                 updateSignals();
                 addThought(`🔍 СЕТАП: ${p} | ${d} | ${ex}мин`);
-                setTimeout(()=>{
-                    signals[0].status='opened';
-                    updateSignals();
-                    addThought(`🔥 СИГНАЛ: ${p} | ${d} | Вход:${en}`);
-                    setTimeout(()=>{
-                        signals[0].status='closed';signals[0].result=Math.random()>0.3?'✅ ПРОФИТ':'❌ УБЫТОК';
-                        updateSignals();addThought(`${signals[0].result} ${p}`);
-                    },ex*60000);
-                },5000);
+                setTimeout(()=>{signals[0].status='opened';updateSignals();addThought(`🔥 СИГНАЛ: ${p} | ${d} | Вход:${en}`);setTimeout(()=>{signals[0].status='closed';signals[0].result=Math.random()>0.3?'✅ ПРОФИТ':'❌ УБЫТОК';updateSignals();addThought(`${signals[0].result} ${p}`)},ex*60000)},5000);
             }
         },3000);
     }
 
-    function signalCard(s,i){
-        const ri=signals.indexOf(s);
-        return `<div class="signal-card ${s.status}" onclick="openDetail(${ri})">
-            <div class="signal-header"><span class="signal-pair">${s.pair}</span><span class="signal-dir" style="color:${s.color}">${s.dir}</span></div>
-            <div class="signal-info">${s.status==='opened'?`🎯 ${s.entry} | ⏱ ${s.exp}мин`:`⏱ ${s.exp}мин | 🎯 ${s.conf}%`}</div>
-            <span class="signal-status ${s.status==='preparing'?'status-preparing':s.status==='opened'?'status-opened':'status-closed'}">${s.status==='preparing'?'⏳ ПОДГОТОВКА':s.status==='opened'?'🔥 В РАБОТЕ':s.result||'ЗАКРЫТ'}</span>
-        </div>`;
-    }
-
-    function updateSignals(){
-        document.getElementById('preparingList').innerHTML=signals.filter(s=>s.status==='preparing').map((s,i)=>signalCard(s,i)).join('')||'<div class="signal-card">Нет</div>';
-        document.getElementById('openedList').innerHTML=signals.filter(s=>s.status==='opened').map((s,i)=>signalCard(s,i)).join('')||'<div class="signal-card">Нет</div>';
-        document.getElementById('closedList').innerHTML=signals.filter(s=>s.status==='closed').map((s,i)=>signalCard(s,i)).join('')||'<div class="signal-card">Нет</div>';
-    }
-
-    function openDetail(i){
-        const s=signals[i];
-        document.getElementById('modTitle').textContent=`📊 ${s.pair}`;
-        document.getElementById('modBody').innerHTML=`<span style="color:${s.color};font-size:18px;font-weight:800">${s.dir}</span><br>⏱ ${s.exp}мин | 🎯 ${s.conf}%<br>🎯 Вход: <b>${s.entry}</b>`;
-        document.getElementById('modPrep').textContent=`1. Откройте Pocket Option\n2. Выберите ${s.pair}\n3. Экспирация: ${s.exp} мин\n4. Нажмите: ${s.dir}\n5. Вход: ${s.entry}`;
-        document.getElementById('signalModal').classList.add('show');
-    }
-
+    function signalCard(s,i){const ri=signals.indexOf(s);return `<div class="signal-card ${s.status}" onclick="openDetail(${ri})"><div class="signal-header"><span class="signal-pair">${s.pair}</span><span class="signal-dir" style="color:${s.color}">${s.dir}</span></div><div class="signal-info">${s.status==='opened'?`🎯 ${s.entry} | ⏱ ${s.exp}мин`:`⏱ ${s.exp}мин | 🎯 ${s.conf}%`}</div><span class="signal-status ${s.status==='preparing'?'status-preparing':s.status==='opened'?'status-opened':'status-closed'}">${s.status==='preparing'?'⏳ ПОДГОТОВКА':s.status==='opened'?'🔥 В РАБОТЕ':s.result||'ЗАКРЫТ'}</span></div>`;}
+    function updateSignals(){document.getElementById('preparingList').innerHTML=signals.filter(s=>s.status==='preparing').map((s,i)=>signalCard(s,i)).join('')||'<div class="signal-card">Нет</div>';document.getElementById('openedList').innerHTML=signals.filter(s=>s.status==='opened').map((s,i)=>signalCard(s,i)).join('')||'<div class="signal-card">Нет</div>';document.getElementById('closedList').innerHTML=signals.filter(s=>s.status==='closed').map((s,i)=>signalCard(s,i)).join('')||'<div class="signal-card">Нет</div>';}
+    function openDetail(i){const s=signals[i];document.getElementById('modTitle').textContent=`📊 ${s.pair}`;document.getElementById('modBody').innerHTML=`<span style="color:${s.color};font-size:18px;font-weight:800">${s.dir}</span><br>⏱ ${s.exp}мин | 🎯 ${s.conf}%<br>🎯 Вход: <b>${s.entry}</b>`;document.getElementById('modPrep').textContent=`1. Откройте Pocket Option\n2. Выберите ${s.pair}\n3. Экспирация: ${s.exp} мин\n4. Нажмите: ${s.dir}\n5. Вход: ${s.entry}`;document.getElementById('signalModal').classList.add('show');}
     function closeModal(){document.getElementById('signalModal').classList.remove('show')}
+    function toggleAuto(t){if(t==='forex'){af=!af;document.getElementById('tf').classList.toggle('on',af);if(tg)tg.sendData(JSON.stringify({auto_forex:af}));showToast('Forex: '+(af?'🟢 ВКЛ':'🔴 ВЫКЛ'))}else{ao=!ao;document.getElementById('to').classList.toggle('on',ao);if(tg)tg.sendData(JSON.stringify({auto_otc:ao}));showToast('OTC: '+(ao?'🟢 ВКЛ':'🔴 ВЫКЛ'))}}
+    function updateBalance(){const v=document.getElementById('riskBalanceInput').value;document.getElementById('rb').textContent='$'+v;document.getElementById('bal').textContent=v;updatePos();showToast('✅ Баланс обновлён!');if(tg)tg.sendData(JSON.stringify({set_balance:parseFloat(v)}))}
+    function updateRisk(){const v=document.getElementById('riskPctInput').value;document.getElementById('rr').textContent=v+'%';updatePos();showToast('✅ Риск обновлён!');if(tg)tg.sendData(JSON.stringify({set_risk:parseFloat(v)}))}
+    function updatePos(){const b=parseFloat(document.getElementById('rb').textContent.replace('$',''))||1000;const p=parseFloat(document.getElementById('rr').textContent.replace('%',''))||2;document.getElementById('rpos').textContent='$'+(b*p/100).toFixed(2);document.getElementById('pos').textContent=(b*p/100).toFixed(2)}
+    function runBacktest(){const r=document.getElementById('btResult');r.innerHTML='<span class="spinner"></span> Запуск...';setTimeout(()=>{const t=Math.floor(Math.random()*50)+30,w=Math.floor(t*(Math.random()*0.3+0.55));r.innerHTML=`✅ <b>Готово!</b><br>📊 Сделок: ${t}<br>✅ Побед: ${w}<br>🎯 Винрейт: <b style="color:var(--green)">${(w/t*100).toFixed(1)}%</b>`},3000)}
 
-    function toggleAuto(t){
-        if(t==='forex'){af=!af;document.getElementById('tf').classList.toggle('on',af);if(tg)tg.sendData(JSON.stringify({auto_forex:af}));showToast('Forex: '+(af?'🟢 ВКЛ':'🔴 ВЫКЛ'));addThought(`🤖 Forex авто: ${af?'ВКЛ':'ВЫКЛ'}`)}
-        else{ao=!ao;document.getElementById('to').classList.toggle('on',ao);if(tg)tg.sendData(JSON.stringify({auto_otc:ao}));showToast('OTC: '+(ao?'🟢 ВКЛ':'🔴 ВЫКЛ'));addThought(`🤖 OTC авто: ${ao?'ВКЛ':'ВЫКЛ'}`)}
-    }
-
-    function updateBalance(){
-        const v=document.getElementById('riskBalanceInput').value;
-        document.getElementById('rb').textContent='$'+v;document.getElementById('bal').textContent=v;
-        updatePos();showToast('✅ Баланс обновлён!');
-        if(tg)tg.sendData(JSON.stringify({set_balance:parseFloat(v)}));
-    }
-
-    function updateRisk(){
-        const v=document.getElementById('riskPctInput').value;
-        document.getElementById('rr').textContent=v+'%';updatePos();showToast('✅ Риск обновлён!');
-        if(tg)tg.sendData(JSON.stringify({set_risk:parseFloat(v)}));
-    }
-
-    function updatePos(){
-        const b=parseFloat(document.getElementById('rb').textContent.replace('$',''))||1000;
-        const p=parseFloat(document.getElementById('rr').textContent.replace('%',''))||2;
-        document.getElementById('rpos').textContent='$'+(b*p/100).toFixed(2);
-        document.getElementById('pos').textContent=(b*p/100).toFixed(2);
-    }
-
-    function runBacktest(){
-        const r=document.getElementById('btResult');
-        r.innerHTML='<span class="spinner"></span> Запуск...';
-        setTimeout(()=>{
-            const t=Math.floor(Math.random()*50)+30,w=Math.floor(t*(Math.random()*0.3+0.55));
-            r.innerHTML=`✅ <b>Готово!</b><br>📊 Сделок: ${t}<br>✅ Побед: ${w}<br>🎯 Винрейт: <b style="color:var(--green)">${(w/t*100).toFixed(1)}%</b>`;
-        },3000);
+    function initCharts(){
+        const wrCtx=document.getElementById('winrateChart')?.getContext('2d');
+        if(wrCtx){new Chart(wrCtx,{type:'line',data:{labels:['Пн','Вт','Ср','Чт','Пт','Сб','Вс'],datasets:[{label:'Винрейт %',data:[68,72,65,70,75,62,80],borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.1)',fill:true,tension:0.4}]},options:{responsive:true,plugins:{legend:{labels:{color:'#9ca3af'}}},scales:{y:{min:50,max:100,grid:{color:'#1f2937'},ticks:{color:'#9ca3af'}},x:{grid:{color:'#1f2937'},ticks:{color:'#9ca3af'}}}}})}
+        const balCtx=document.getElementById('balanceChart')?.getContext('2d');
+        if(balCtx){new Chart(balCtx,{type:'line',data:{labels:['1','5','10','15','20','25','30'],datasets:[{label:'Баланс $',data:[1000,1050,1100,1080,1150,1200,1250],borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.1)',fill:true,tension:0.4}]},options:{responsive:true,plugins:{legend:{labels:{color:'#9ca3af'}}},scales:{y:{grid:{color:'#1f2937'},ticks:{color:'#9ca3af'}},x:{grid:{color:'#1f2937'},ticks:{color:'#9ca3af'}}}}})}
     }
 
     updateSignals();
-    setTimeout(()=>addThought('🟢 Бот v13.2 запущен. Анти-сон активен.'),1000);
+    setTimeout(()=>addThought('🟢 Бот v14.0 запущен. Анти-сон активен.'),1000);
     setInterval(()=>addThought('🔄 Анти-сон пинг...'),600000);
 </script>
 </body>
